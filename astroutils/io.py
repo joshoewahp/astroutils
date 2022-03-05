@@ -59,23 +59,16 @@ def get_surveys():
     return surveys
 
 
-def load_image_selavy(epoch: pd.Series, field: str, stokes: str, load: bool=False):
-    """Load image and selavy file for a given field, epoch, and Stokes parameter."""
+def get_image(epoch: pd.Series, field: str, stokes: str, load: bool=False):
+    """Get image header and data for a given field, epoch, and Stokes parameter."""
 
     image_file = list(Path(epoch[f'image_path_{stokes}']).glob(f'*{field}*.fits'))[0]
     with fits.open(image_file) as hdul:
         data = hdul[0].data if load else None
         header = hdul[0].header
-        bmaj, bmin = header['BMAJ'], header['BMIN']
 
-    selavy = list(Path(epoch[f'selavy_path_{stokes}']).glob(f'*{field}*components.xml'))
-    if stokes == 'v':
-        selavy = combine_stokesv_selavy(selavy)
-    else:
-        selavy = load_selavy_file(selavy[0])
+    return data, header
 
-    return data, header, selavy
-        
 
 def load_selavy_file(selavypath: Path) -> pd.DataFrame:
     """Import selavy catalogue to pandas DataFrame."""
@@ -101,6 +94,19 @@ def load_selavy_file(selavypath: Path) -> pd.DataFrame:
         sources = pd.read_fwf(selavypath, skiprows=[1]).drop(columns=['#'])
 
     return sources
+
+
+def get_selavy(epoch: pd.Series, field: str, stokes: str):
+    """Get all selavy components in a given field, epoch, and Stokes parameter."""
+
+    selavy = list(Path(epoch[f'selavy_path_{stokes}']).glob(f'*{field}*components.xml'))
+
+    if stokes == 'v':
+        selavy = combine_stokesv_selavy(selavy)
+    else:
+        selavy = load_selavy_file(selavy[0])
+
+    return selavy
 
 
 def combine_stokesv_selavy(selavy_files: list[Path]) -> pd.DataFrame:

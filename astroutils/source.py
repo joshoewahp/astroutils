@@ -8,13 +8,14 @@ from astropy.nddata import Cutout2D
 from astropy.wcs import WCS
 from pathlib import Path
 
-from astroutils.io import find_fields, load_image_selavy
+from astroutils.io import find_fields, get_image, get_selavy
 
 logger = logging.getLogger(__name__)
 
 
 def get_selavy_component(position: SkyCoord, selavy: pd.DataFrame, radius):
     """Find closest selavy component within radius of position."""
+
     selavy_coords = SkyCoord(ra=selavy.ra_deg_cont, dec=selavy.dec_deg_cont, unit=u.deg)
     selavy['d2d'] = position.separation(selavy_coords).arcsec
 
@@ -125,7 +126,8 @@ def measure_flux(position, epochs, radius, fluxtype, stokes, name='source'):
         for _, field in fields.iterrows():
 
             fieldname = field.field
-            _, header, selavy = load_image_selavy(epoch, fieldname, stokes)
+            _, header = get_image(epoch, fieldname, stokes, load=False)
+            selavy = get_selavy(epoch, fieldname, stokes)
             component = get_selavy_component(position, selavy, radius=radius*u.arcsec)
 
             if component is None:
