@@ -59,6 +59,18 @@ def get_surveys():
     return surveys
 
 
+def get_survey(epoch):
+    """Get a single survey epoch from surveys.json."""
+
+    surveys = get_surveys()
+    if epoch not in surveys.survey.values:
+        raise NotImplementedError(f"{epoch} not a valid survey in surveys.json")
+
+    survey = surveys[surveys.survey == epoch].iloc[0]
+        
+    return survey
+
+
 def get_image(epoch: pd.Series, field: str, stokes: str, load: bool=False):
     """Get image header and data for a given field, epoch, and Stokes parameter."""
 
@@ -68,60 +80,6 @@ def get_image(epoch: pd.Series, field: str, stokes: str, load: bool=False):
         header = hdul[0].header
 
     return data, header
-
-
-def load_selavy_file(selavypath: Path) -> pd.DataFrame:
-    """Import selavy catalogue to pandas DataFrame."""
-
-    if isinstance(selavypath, str):
-        selavypath = Path(selavypath)
-
-    # Handle loading of multiple source file formats
-    if selavypath.suffix in ['.xml', '.vot']:
-        sources = Table.read(
-            selavypath, format="votable", use_names_over_ids=True
-        ).to_pandas()
-    elif selavypath.suffix == '.csv':
-        # CSVs from CASDA have all lowercase column names
-        sources = pd.read_csv(selavypath).rename(
-            columns={"spectral_index_from_tt": "spectral_index_from_TT"}
-        )
-        # Remove unused columns for consistency
-        sources.drop(columns=['id', 'catalogue_id', 'first_sbid', 'other_sbids',
-                              'project_id', 'quality_level', 'released_date'],
-                     inplace=True)
-    else:
-        sources = pd.read_fwf(selavypath, skiprows=[1]).drop(columns=['#'])
-
-    return sources
-
-
-def get_selavy(epoch: pd.Series, field: str, stokes: str):
-    """Get all selavy components in a given field, epoch, and Stokes parameter."""
-
-    selavy = list(Path(epoch[f'selavy_path_{stokes}']).glob(f'*{field}*components.xml'))
-
-    if stokes == 'v':
-        selavy = combine_stokesv_selavy(selavy)
-    else:
-        selavy = load_selavy_file(selavy[0])
-
-    return selavy
-
-
-def combine_stokesv_selavy(selavy_files: list[Path]) -> pd.DataFrame:
-    """Combine positive and negative selavy files into one DataFrame."""
-
-    selavy = []
-    for f in selavy_files:
-        df = load_selavy_file(f)
-
-        df['sign'] = -1 if (f.name[0] == 'n' or 'nimage' in f.name) else 1
-        logger.debug(f"{len(df)} rows loaded from {f}")
-        
-        selavy.append(df)
-
-    return pd.concat(selavy)
 
 
 def find_fields(position, epoch):
@@ -181,13 +139,7 @@ def make_mwats_field_csv():
 def build_field_csv(epoch):
     """Generate metadata csv for dataset fields."""
 
-    surveys = get_surveys()
-
-    try:
-        survey = surveys[surveys.survey == epoch].iloc[0]
-    except IndexError:
-        exit(f"{epoch} not a valid survey in surveys.json")
-        
+    survey = get_survey(epoch)
     paths = glob.glob(survey.image_path_i + '*.fits')
 
     pattern = re.compile(r'\S*(\d{4}[-+]\d{2})\S*')
