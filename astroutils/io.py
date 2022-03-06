@@ -146,17 +146,17 @@ def build_field_csv(epoch):
     sbidpattern = re.compile(r'\S*(SB\d{4,5})\S*')
 
     vals = []
-    for field in paths:
+    for path in paths:
 
-        name = pattern.sub(r'\1', field)
-        if name == field:
-            name = sbidpattern.sub(r'\1', field)
+        field = pattern.sub(r'\1', path)
+        if field == path:
+            field = sbidpattern.sub(r'\1', path)
 
-        sbid = sbidpattern.sub(r'\1', field)
-        if sbid == field:
+        sbid = sbidpattern.sub(r'\1', path)
+        if sbid == path:
             sbid = 'SBXXX'
 
-        with fits.open(field) as hdul:
+        with fits.open(path) as hdul:
             header = hdul[0].header
             w = WCS(header, naxis=2)
             size_x = header["NAXIS1"]
@@ -167,8 +167,9 @@ def build_field_csv(epoch):
 
 
         params = {
-            'field': name,
+            'field': field,
             'sbid': sbid,
+            'path': path,
             'cr_ra_pix': centre[0][0],
             'cr_dec_pix': centre[0][1],
             'bmaj': header['BMAJ'] * 3600,
