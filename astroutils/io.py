@@ -140,13 +140,14 @@ def build_field_csv(epoch):
     """Generate metadata csv for dataset fields."""
 
     survey = get_survey(epoch)
-    paths = glob.glob(survey.image_path_i + '*.fits')
+    i_paths = glob.glob(survey.image_path_i + '*.fits')
+    v_paths = glob.glob(survey.image_path_v + '*.fits')
 
     pattern = re.compile(r'\S*(\d{4}[-+]\d{2})\S*')
     sbidpattern = re.compile(r'\S*(SB\d{4,5})\S*')
 
     vals = []
-    for path in paths:
+    for path in i_paths:
 
         field = pattern.sub(r'\1', path)
         if field == path:
@@ -165,11 +166,12 @@ def build_field_csv(epoch):
             central_coords = [[size_x / 2., size_y / 2.]]
             centre = w.wcs_pix2world(np.array(central_coords, np.float_), 1)
 
-
+        v_path = [p for p in v_paths if field in p][0]
         params = {
             'field': field,
             'sbid': sbid,
-            'path': path,
+            'i_path': path,
+            'v_path': v_path,
             'cr_ra_pix': centre[0][0],
             'cr_dec_pix': centre[0][1],
             'bmaj': header['BMAJ'] * 3600,
