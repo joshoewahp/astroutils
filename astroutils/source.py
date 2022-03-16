@@ -47,6 +47,8 @@ class SelavyCatalogue:
             components.drop(columns=['id', 'catalogue_id', 'first_sbid', 'other_sbids',
                                      'project_id', 'quality_level', 'released_date'],
                         inplace=True)
+        elif selavypath.suffix == '.parq':
+            components = pd.read_parquet(selavypath)
         else:
             components = pd.read_fwf(selavypath, skiprows=[1]).drop(columns=['#'])
 
@@ -73,31 +75,57 @@ class SelavyCatalogue:
     def from_aegean(cls, aegeanpath):
         """Load Aegean source components and convert to selavy format."""
 
+        components = cls(aegeanpath)
+
         columns = {
             'island': 'island_id',
             'source': 'component_id',
             'local_rms': 'rms_image',
+            'rms_background': 'rms_image',
             'ra': 'ra_deg_cont',
             'dec': 'dec_deg_cont',
             'err_ra': 'ra_deg_cont_err',
             'err_dec': 'dec_deg_cont_err',
             'peak_flux': 'flux_peak',
             'err_peak_flux': 'flux_peak_err',
+            'raw_peak_flux': 'flux_peak',
+            'err_raw_peak_flux': 'flux_peak_err',
             'int_flux': 'flux_int',
             'err_int_flux': 'flux_int_err',
+            'raw_total_flux': 'flux_int',
+            'err_total_peak_flux': 'flux_int_err',
             'a': 'maj_axis',
+            'bmaj': 'maj_axis',
             'err_a': 'maj_axis_err',
             'b': 'min_axis',
+            'bmin': 'min_axis',
             'err_b': 'min_axis_err',
             'pa': 'pos_ang',
             'err_pa': 'pos_ang_err',
         }
-        pass
+        components.components.rename(columns=columns, inplace=True)
+        components.components.maj_axis *= 3600
+        components.components.min_axis *= 3600
+
+        return components
 
     def cone_search(self, position: SkyCoord, radius):
         """Return DataFrame of components within radius of position, sorted by match distance."""
 
         components = self.components.copy()
+
+        # Coarse filter of 1 degree radius around large catalogues
+        # FIXME: coordinate wrapping is a problem here
+        coarse_radius = 1*u.degree
+        if len(components) > 10000 and radius <= 1*u.deg:
+            components = components[
+                (components.ra_deg_cont > position.ra - coarse_radius) &
+                (components.ra_deg_cont < position.ra + coarse_radius) &
+                (components.dec_deg_cont > position.dec - coarse_radius) &
+                (components.dec_deg_cont < position.dec + coarse_radius)
+            ]
+
+        
         selavy_coords = SkyCoord(ra=components.ra_deg_cont, dec=components.dec_deg_cont, unit=u.deg)
         components['d2d'] = position.separation(selavy_coords).arcsec
 

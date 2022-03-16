@@ -1176,6 +1176,28 @@
     "cutout_size": 0.15
   },
   {
+    "survey": "mwats",
+    "name": "MWATS",
+    "ada_root": "/import/ada1/jpri6587/data/mwats/",
+    "selavy_path_i": "",
+    "image_path_i": "IMAGES/",
+    "selavy_path_v": "",
+    "image_path_v": "IMAGES/",
+    "frequency": 154,
+    "rms": 50,
+    "flux_col": "flux_int",
+    "flux_mult": 1,
+    "pos_err": 4,
+    "dec_min": -90,
+    "dec_max": 40,
+    "gal_lim": 0,
+    "has_stokesv": true,
+    "local": true,
+    "radio": true,
+    "cutout": true,
+    "cutout_size": 0.15
+  },
+  {
     "survey": "lotss",
     "name": "LOTSS",
     "vizier": "J/A+A/622/A1/lotssdr1",
