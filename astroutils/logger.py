@@ -1,7 +1,9 @@
+from typing import Optional
 import colorlog
 import logging
 
-def setupLogger(verbose, filename=None):
+
+def setupLogger(verbose: bool, filename: Optional[str]=None) -> None:
 
     level = logging.DEBUG if verbose else logging.INFO
 
@@ -20,7 +22,8 @@ def setupLogger(verbose, filename=None):
     if filename:
         formatter = logging.Formatter(
             '%(levelname)-8s %(asctime)s - %(name)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S')
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
         file_handler = logging.FileHandler(filename)
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
@@ -29,13 +32,17 @@ def setupLogger(verbose, filename=None):
         '%(log_color)s%(levelname)-8s%(reset)s %(asctime)s - %(name)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
         reset=True,
-        log_colors={'DEBUG': 'cyan',
-                    'INFO': 'green',
-                    'WARNING': 'yellow',
-                    'ERROR': 'red',
-                    'CRITICAL': 'red,bg_white', })
+        log_colors={
+            'DEBUG': 'cyan',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
+            'CRITICAL': 'red,bg_white'
+        })
 
     stream_handler = colorlog.StreamHandler()
     stream_handler.setFormatter(colorformatter)
 
     root_logger.addHandler(stream_handler)
+
+    return None

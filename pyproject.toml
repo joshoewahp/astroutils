@@ -12,12 +12,31 @@ numpy = "^1.22.2"
 matplotlib = "^3.5.1"
 colorlog = "^6.6.0"
 pyarrow = "^7.0.0"
+click = "^8.0.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
+coverage = "^6.3.2"
+mypy = "^0.941"
 
 [tool.poetry.scripts]
 astroutils-build-fields = "astroutils.cli.build_fields:main"
+
+[tool.pyright]
+reportMissingTypeStubs = false
+reportGeneralTypeIssues = false
+reportOptionalSubscript = false
+reportOptionalMemberAccess = false
+
+[tool.mypy]
+
+[[tool.mypy.overrides]]
+module = "pandas.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "astropy.*"
+ignore_missing_imports = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

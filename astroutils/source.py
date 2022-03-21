@@ -3,20 +3,20 @@ import astropy.units as u
 import numpy as np
 import pandas as pd
 from astropy.coordinates import SkyCoord
-from astropy.io import fits
 from astropy.nddata import Cutout2D
 from astropy.table import Table
 from astropy.wcs import WCS
 from pathlib import Path
+from typing import Union, cast
 
-from astroutils.io import find_fields, get_survey, get_image
+from astroutils.io import find_fields, get_image_data_header, get_survey, get_image_from_survey_params
 
 logger = logging.getLogger(__name__)
 
 
 class SelavyCatalogue:
 
-    def __init__(self, selavypath):
+    def __init__(self, selavypath: Union[str, Path, list[str], list[Path]]):
 
         if isinstance(selavypath, str):
             selavypath = [Path(selavypath)]
@@ -24,11 +24,8 @@ class SelavyCatalogue:
             selavypath = [selavypath]
         elif isinstance(selavypath, list) and isinstance(selavypath[0], str):
             selavypath = [Path(p) for p in selavypath]
-            
-        if not (isinstance(selavypath, list) and all([isinstance(p, Path) for p in selavypath])):
-            raise TypeError(f"{selavypath} must be either a Path or list of Paths.")
 
-        self.selavypath = selavypath
+        self.selavypath = cast(list[Path], selavypath)
         self.components = pd.concat([self._load(p) for p in self.selavypath])
 
     def _load(self, selavypath: Path) -> pd.DataFrame:
@@ -38,15 +35,6 @@ class SelavyCatalogue:
             components = Table.read(
                 selavypath, format="votable", use_names_over_ids=True
             ).to_pandas()
-        elif selavypath.suffix == '.csv':
-            # CSVs from CASDA have all lowercase column names
-            components = pd.read_csv(selavypath).rename(
-                columns={"spectral_index_from_tt": "spectral_index_from_TT"}
-            )
-            # Remove unused columns for consistency
-            components.drop(columns=['id', 'catalogue_id', 'first_sbid', 'other_sbids',
-                                     'project_id', 'quality_level', 'released_date'],
-                        inplace=True)
         elif selavypath.suffix == '.parq':
             components = pd.read_parquet(selavypath)
         else:
@@ -58,9 +46,9 @@ class SelavyCatalogue:
 
     @classmethod
     def from_params(cls, epoch: str, field: str, stokes: str):
-        epoch = get_survey(epoch)
+        survey = get_survey(epoch)
 
-        selavypath = Path(epoch[f'selavy_path_{stokes}'])
+        selavypath = Path(survey[f'selavy_path_{stokes}'])
         # First try locating catalogues in xml format, then try txt format
         selavy_files = list(selavypath.glob(f'*{field}*components.xml'))
         if len(selavy_files) == 0:
@@ -72,10 +60,10 @@ class SelavyCatalogue:
         return cls(selavy_files)
 
     @classmethod
-    def from_aegean(cls, aegeanpath):
-        """Load Aegean source components and convert to selavy format."""
+    def from_aegean(cls, aegeanpath: Union[str, Path]):
+        """Load Aegean source cat and convert to selavy format."""
 
-        components = cls(aegeanpath)
+        cat = cls(aegeanpath)
 
         columns = {
             'island': 'island_id',
@@ -84,8 +72,8 @@ class SelavyCatalogue:
             'rms_background': 'rms_image',
             'ra': 'ra_deg_cont',
             'dec': 'dec_deg_cont',
-            'err_ra': 'ra_deg_cont_err',
-            'err_dec': 'dec_deg_cont_err',
+            'err_ra': 'ra_err',
+            'err_dec': 'dec_err',
             'peak_flux': 'flux_peak',
             'err_peak_flux': 'flux_peak_err',
             'raw_peak_flux': 'flux_peak',
@@ -93,7 +81,7 @@ class SelavyCatalogue:
             'int_flux': 'flux_int',
             'err_int_flux': 'flux_int_err',
             'raw_total_flux': 'flux_int',
-            'err_total_peak_flux': 'flux_int_err',
+            'err_raw_total_flux': 'flux_int_err',
             'a': 'maj_axis',
             'bmaj': 'maj_axis',
             'err_a': 'maj_axis_err',
@@ -103,53 +91,53 @@ class SelavyCatalogue:
             'pa': 'pos_ang',
             'err_pa': 'pos_ang_err',
         }
-        components.components.rename(columns=columns, inplace=True)
-        components.components.maj_axis *= 3600
-        components.components.min_axis *= 3600
 
-        return components
+        cat.components.rename(columns=columns, inplace=True)
 
-    def cone_search(self, position: SkyCoord, radius):
-        """Return DataFrame of components within radius of position, sorted by match distance."""
+        cat.components.maj_axis *= 3600
+        cat.components.min_axis *= 3600
+
+        return cat
+
+    def cone_search(self, position: SkyCoord, radius: u.Quantity) -> pd.DataFrame:
+        """Find components within radius of position."""
 
         components = self.components.copy()
 
-        # Coarse filter of 1 degree radius around large catalogues
-        # FIXME: coordinate wrapping is a problem here
-        coarse_radius = 1*u.degree
-        if len(components) > 10000 and radius <= 1*u.deg:
-            components = components[
-                (components.ra_deg_cont > position.ra - coarse_radius) &
-                (components.ra_deg_cont < position.ra + coarse_radius) &
-                (components.dec_deg_cont > position.dec - coarse_radius) &
-                (components.dec_deg_cont < position.dec + coarse_radius)
-            ]
-
-        
         selavy_coords = SkyCoord(ra=components.ra_deg_cont, dec=components.dec_deg_cont, unit=u.deg)
         components['d2d'] = position.separation(selavy_coords).arcsec
 
         return components[components.d2d < radius.to(u.arcsec)]
 
-    def nearest_component(self, position: SkyCoord, radius):
+    def nearest_component(self, position: SkyCoord, radius: u.Quantity) -> Union[pd.Series, None]:
         """Return closest SelavyComponent within radius of position."""
 
         components = self.cone_search(position, radius)
 
-        if components.d2d.min() > radius.to(u.arcsec).value:
-            return
-
+        if components.empty:
+            return None
+        
         return components.sort_values('d2d').iloc[0]
 
 
-def condon_flux_error(component, bmaj, bmin, flux_scale_error=0, fluxtype='int'):
+def condon_flux_error(
+        component: pd.Series,
+        bmaj: u.Quantity,
+        bmin: u.Quantity,
+        flux_scale_error: float=0.,
+        fluxtype: str='int'
+) -> float:
     """Flux density errors of selavy component according to Condon (1997) / Condon (1998)."""
+
+    if not isinstance(bmaj, u.Quantity) or not isinstance(bmin, u.Quantity):
+        raise TypeError(f"bmaj and bmin must be of type Quantity")
+
+    bmaj = bmaj.to(u.arcsec).value
+    bmin = bmin.to(u.arcsec).value
 
     flux = component[f'flux_{fluxtype}']
     rms = component['rms_image']
     snr = flux / rms
-    bmaj *= 3600
-    bmin *= 3600
 
     theta_M = component['maj_axis']
     theta_m = component['min_axis']
@@ -157,7 +145,7 @@ def condon_flux_error(component, bmaj, bmin, flux_scale_error=0, fluxtype='int')
     alpha_m = 1.5
 
     # Potential future parameters
-    clean_bias = 0
+    # clean_bias = 0
     clean_bias_error = 0
 
     # Condon (1997) Equation 40
@@ -184,7 +172,12 @@ def condon_flux_error(component, bmaj, bmin, flux_scale_error=0, fluxtype='int')
     return flux_error
 
 
-def fractional_pol_error(sources, flux_col='flux', fp_col='fp', corr_errors=False):
+def fractional_pol_error(
+        sources: pd.DataFrame,
+        flux_col: str='flux',
+        fp_col: str='fp',
+        corr_errors: bool=False,
+) -> pd.DataFrame:
     """Propagate uncertainty from Stokes I and V flux density to fractional polarisation.
 
     NOTE: Accounting for error correlation requires more thought.
@@ -202,11 +195,22 @@ def fractional_pol_error(sources, flux_col='flux', fp_col='fp', corr_errors=Fals
     I_rel_err = sources[f'{flux_col}_err_i'] / sources[f'{flux_col}_i']
     V_rel_err = sources[f'{flux_col}_err_v'] / sources[f'{flux_col}_v']
 
-    return np.sqrt((I_rel_err ** 2 + V_rel_err ** 2) * sources[fp_col] ** 2 -
-                2 * sources[fp_col]**2 * I_rel_err * V_rel_err * corr_xy)
+    pol_error = np.sqrt(
+        (I_rel_err ** 2 + V_rel_err ** 2) * sources[fp_col] ** 2 -
+        2 * sources[fp_col]**2 * I_rel_err * V_rel_err * corr_xy
+    )
+
+    return pol_error
 
 
-def measure_flux(position, epochs, radius, fluxtype, stokes, name='source'):
+def measure_flux(
+        position: SkyCoord,
+        epochs: pd.DataFrame,
+        size: u.Quantity,
+        fluxtype: str,
+        stokes: str,
+        name: str='source'
+) -> pd.DataFrame:
     """Measure flux or 3-sigma nondetection limit in multiple epochs at position."""
 
     flux_list = []
@@ -224,9 +228,10 @@ def measure_flux(position, epochs, radius, fluxtype, stokes, name='source'):
         for _, field in fields.iterrows():
 
             fieldname = field.field
-            _, header = get_image(epoch, fieldname, stokes, load=False)
-            selavy = SelavyCatalogue(epoch, fieldname, stokes)
-            component = selavy.nearest_component(position, radius=radius*u.arcsec)
+            _, header = get_image_from_survey_params(epoch, fieldname, stokes, load=False)
+        
+            selavy = SelavyCatalogue.from_params(epoch['name'], fieldname, stokes)
+            component = selavy.nearest_component(position, radius=size)
 
             if component is None:
                 # Measure 3-sigma limit from RMS map
@@ -243,7 +248,7 @@ def measure_flux(position, epochs, radius, fluxtype, stokes, name='source'):
                 flux = component.flux_int * component.sign
                 
                 # Calculate Condon flux error if component was found
-                bmaj, bmin = header['BMAJ'], header['BMIN']
+                bmaj, bmin = header['BMAJ']*u.deg, header['BMIN']*u.deg
                 flux_err = condon_flux_error(component, bmaj, bmin, fluxtype=fluxtype)
                 limit = False
 
@@ -263,18 +268,16 @@ def measure_flux(position, epochs, radius, fluxtype, stokes, name='source'):
     return flux_table 
 
 
-def measure_limit(position: SkyCoord, image_path: Path, radius) -> pd.Series:
+def measure_limit(position: SkyCoord, image_path: Path, size: u.Quantity) -> pd.Series:
     """Calculate 3-sigma rms limit from at position in image."""
 
-    with fits.open(image_path) as hdul:
-        header, data = hdul[0].header, hdul[0].data * 1e3
-        
+    data, header = get_image_data_header(image_path)
     wcs = WCS(header, naxis=2)
         
     try:
-        cutout = Cutout2D(data[0, 0, :, :], position, radius, wcs=wcs)
+        cutout = Cutout2D(data[0, 0, :, :], position, size, wcs=wcs)
     except IndexError:
-        cutout = Cutout2D(data, position, radius, wcs=wcs)
+        cutout = Cutout2D(data, position, size, wcs=wcs)
 
     if 'rms' in image_path.name:
         return 3 * np.median(cutout.data)

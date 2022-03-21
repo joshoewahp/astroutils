@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<VOTABLE version="1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
+ xmlns:stc="http://www.ivoa.net/xml/STC/v1.30" >
+  <COOSYS ID="B1950" equinox="B1950" system="eq_FK4"/>
+  <RESOURCE name="Component catalogue from Selavy source finding">
+    <TABLE name="Component catalogue">
+      <DESCRIPTION></DESCRIPTION>
+      <PARAM name="table_version" ucd="meta.version" datatype="char" arraysize="43" value="casda.continuum_component_description_v1.9"/>
+      <PARAM name="imageFile" ucd="meta.file;meta.fits" datatype="char" arraysize="76" value="/project/transients/askap/PILOT/VAST_epoch8/I0_mosaic_1.0/VAST_1237+00A.fits"/>
+      <PARAM name="flagSubsection" ucd="meta.code" datatype="boolean" value="1"/>
+      <PARAM name="subsection" ucd="" datatype="char" arraysize="17" value="[1:13700,1:13690]"/>
+      <PARAM name="flagStatSec" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="StatSec" ucd="" datatype="char" arraysize="7" value="[*,*,*]"/>
+      <PARAM name="searchType" ucd="meta.note" datatype="char" arraysize="7" value="spatial"/>
+      <PARAM name="flagNegative" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="flagBaseline" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="flagRobustStats" ucd="meta.code" datatype="boolean" value="1"/>
+      <PARAM name="flagFDR" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="threshold" ucd="phot.flux;stat.min" datatype="float" value="5"/>
+      <PARAM name="flagGrowth" ucd="meta.code" datatype="boolean" value="1"/>
+      <PARAM name="growthThreshold" ucd="phot.flux;stat.min" datatype="float" value="3"/>
+      <PARAM name="minPix" ucd="" datatype="int" value="3"/>
+      <PARAM name="minChannels" ucd="" datatype="int" value="0"/>
+      <PARAM name="minVoxels" ucd="" datatype="int" value="3"/>
+      <PARAM name="flagAdjacent" ucd="meta.code" datatype="boolean" value="1"/>
+      <PARAM name="threshVelocity" ucd="" datatype="float" value="7"/>
+      <PARAM name="flagRejectBeforeMerge" ucd="" datatype="boolean" value="0"/>
+      <PARAM name="flagTwoStageMerging" ucd="" datatype="boolean" value="1"/>
+      <PARAM name="pixelCentre" ucd="" datatype="char" arraysize="8" value="centroid"/>
+      <PARAM name="flagSmooth" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="flagATrous" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="thresholdActual" ucd="" datatype="float" unit="Jy/beam" value="5"/>
+      <FIELD name="island_id" ID="col_island_id" ucd="meta.id.parent" datatype="char" unit="--" arraysize="20"/>
+      <FIELD name="component_id" ID="col_component_id" ucd="meta.id;meta.main" datatype="char" unit="--" arraysize="24"/>
+      <FIELD name="component_name" ID="col_component_name" ucd="meta.id" datatype="char" unit="" arraysize="26"/>
+      <FIELD name="ra_hms_cont" ID="col_ra_hms_cont" ucd="pos.eq.ra" ref="J2000" datatype="char" unit="" arraysize="12"/>
+      <FIELD name="dec_dms_cont" ID="col_dec_dms_cont" ucd="pos.eq.dec" ref="J2000" datatype="char" unit="" arraysize="13"/>
+      <FIELD name="ra_deg_cont" ID="col_ra_deg_cont" ucd="pos.eq.ra;meta.main" ref="J2000" datatype="double" unit="deg" width="12" precision="6"/>
+      <FIELD name="dec_deg_cont" ID="col_dec_deg_cont" ucd="pos.eq.dec;meta.main" ref="J2000" datatype="double" unit="deg" width="13" precision="6"/>
+      <FIELD name="ra_err" ID="col_ra_err" ucd="stat.error;pos.eq.ra" ref="J2000" datatype="float" unit="arcsec" width="11" precision="2"/>
+      <FIELD name="dec_err" ID="col_dec_err" ucd="stat.error;pos.eq.dec" ref="J2000" datatype="float" unit="arcsec" width="11" precision="2"/>
+      <FIELD name="freq" ID="col_freq" ucd="em.freq" datatype="float" unit="MHz" width="11" precision="1"/>
+      <FIELD name="flux_peak" ID="col_flux_peak" ucd="phot.flux.density;stat.max;em.radio;stat.fit" datatype="float" unit="mJy/beam" width="11" precision="3"/>
+      <FIELD name="flux_peak_err" ID="col_flux_peak_err" ucd="stat.error;phot.flux.density;stat.max;em.radio;stat.fit" datatype="float" unit="mJy/beam" width="14" precision="3"/>
+      <FIELD name="flux_int" ID="col_flux_int" ucd="phot.flux.density;em.radio;stat.fit" datatype="float" unit="mJy" width="10" precision="3"/>
+      <FIELD name="flux_int_err" ID="col_flux_int_err" ucd="stat.error;phot.flux.density;em.radio;stat.fit" datatype="float" unit="mJy" width="13" precision="3"/>
+      <FIELD name="maj_axis" ID="col_maj_axis" ucd="phys.angSize.smajAxis;em.radio;stat.fit" datatype="float" unit="arcsec" width="9" precision="2"/>
+      <FIELD name="min_axis" ID="col_min_axis" ucd="phys.angSize.sminAxis;em.radio;stat.fit" datatype="float" unit="arcsec" width="9" precision="2"/>
+      <FIELD name="pos_ang" ID="col_pos_ang" ucd="phys.angSize;pos.posAng;em.radio;stat.fit" datatype="float" unit="deg" width="8" precision="2"/>
+      <FIELD name="maj_axis_err" ID="col_maj_axis_err" ucd="stat.error;phys.angSize.smajAxis;em.radio" datatype="float" unit="arcsec" width="13" precision="2"/>
+      <FIELD name="min_axis_err" ID="col_min_axis_err" ucd="stat.error;phys.angSize.sminAxis;em.radio" datatype="float" unit="arcsec" width="13" precision="2"/>
+      <FIELD name="pos_ang_err" ID="col_pos_ang_err" ucd="stat.error;phys.angSize;pos.posAng;em.radio" datatype="float" unit="deg" width="12" precision="2"/>
+      <FIELD name="maj_axis_deconv" ID="col_maj_axis_deconv" ucd="phys.angSize.smajAxis;em.radio;askap:meta.deconvolved" datatype="float" unit="arcsec" width="18" precision="2"/>
+      <FIELD name="min_axis_deconv" ID="col_min_axis_deconv" ucd="phys.angSize.sminAxis;em.radio;askap:meta.deconvolved" datatype="float" unit="arcsec" width="16" precision="2"/>
+      <FIELD name="pos_ang_deconv" ID="col_pos_ang_deconv" ucd="phys.angSize;pos.posAng;em.radio;askap:meta.deconvolved" datatype="float" unit="deg" width="15" precision="2"/>
+      <FIELD name="maj_axis_deconv_err" ID="col_maj_axis_deconv_err" ucd="stat.error;phys.angSize.smajAxis;em.radio;askap:meta.deconvolved" datatype="float" unit="arcsec" width="13" precision="2"/>
+      <FIELD name="min_axis_deconv_err" ID="col_min_axis_deconv_err" ucd="stat.error;phys.angSize.sminAxis;em.radio;askap:meta.deconvolved" datatype="float" unit="arcsec" width="13" precision="2"/>
+      <FIELD name="pos_ang_deconv_err" ID="col_pos_ang_deconv_err" ucd="stat.error;phys.angSize;pos.posAng;em.radio;askap:meta.deconvolved" datatype="float" unit="deg" width="12" precision="2"/>
+      <FIELD name="chi_squared_fit" ID="col_chi_squared_fit" ucd="stat.fit.chi2" datatype="float" unit="--" width="17" precision="3"/>
+      <FIELD name="rms_fit_gauss" ID="col_rms_fit_gauss" ucd="stat.stdev;stat.fit" datatype="float" unit="mJy/beam" width="15" precision="3"/>
+      <FIELD name="spectral_index" ID="col_spectral_index" ucd="spect.index;em.radio" datatype="float" unit="--" width="15" precision="2"/>
+      <FIELD name="spectral_curvature" ID="col_spectral_curvature" ucd="askap:spect.curvature;em.radio" datatype="float" unit="--" width="19" precision="2"/>
+      <FIELD name="spectral_index_err" ID="col_spectral_index_err" ucd="stat.error;spect.index;em.radio" datatype="float" unit="--" width="15" precision="2"/>
+      <FIELD name="spectral_curvature_err" ID="col_spectral_curvature_err" ucd="stat.error;askap:spect.curvature;em.radio" datatype="float" unit="--" width="19" precision="2"/>
+      <FIELD name="rms_image" ID="col_rms_image" ucd="stat.stdev;phot.flux.density" datatype="float" unit="mJy/beam" width="12" precision="3"/>
+      <FIELD name="has_siblings" ID="col_has_siblings" ucd="meta.code" datatype="int" unit="" width="8"/>
+      <FIELD name="fit_is_estimate" ID="col_fit_is_estimate" ucd="meta.code" datatype="int" unit="" width="8"/>
+      <FIELD name="spectral_index_from_TT" ID="col_spectral_index_from_TT" ucd="meta.code" datatype="int" unit="" width="8"/>
+      <FIELD name="flag_c4" ID="col_flag_c4" ucd="meta.code" datatype="int" unit="" width="8"/>
+      <FIELD name="comment" ID="col_comment" ucd="meta.note" datatype="char" unit="" arraysize="100"/>
+      <DATA>
+        <TABLEDATA>
+        <TR>
+          <TD> SB11410_island_1000</TD><TD> SB11410_component_1000a</TD><TD>                B1240-0437</TD><TD>  12:40:18.4</TD><TD>    -04:37:58</TD><TD>  190.076816</TD><TD>    -4.632783</TD><TD>       0.03</TD><TD>       0.02</TD><TD>       -0.0</TD><TD>     17.005</TD><TD>         0.082</TD><TD>    15.514</TD><TD>        0.112</TD><TD>    12.96</TD><TD>    11.59</TD><TD>   84.16</TD><TD>         0.06</TD><TD>         0.02</TD><TD>        1.78</TD><TD>              2.52</TD><TD>            0.00</TD><TD>          87.03</TD><TD>         0.04</TD><TD>         0.00</TD><TD>        0.46</TD><TD>           17.510</TD><TD>        489.754</TD><TD>          -1.03</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.406</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1001</TD><TD> SB11410_component_1001a</TD><TD>                B1230-0420</TD><TD>  12:30:54.4</TD><TD>    -04:20:40</TD><TD>  187.726700</TD><TD>    -4.344675</TD><TD>       0.03</TD><TD>       0.03</TD><TD>       -0.0</TD><TD>     16.294</TD><TD>         0.096</TD><TD>    17.301</TD><TD>        0.146</TD><TD>    14.00</TD><TD>    12.48</TD><TD>   62.21</TD><TD>         0.08</TD><TD>         0.02</TD><TD>        2.09</TD><TD>              5.71</TD><TD>            0.00</TD><TD>          66.93</TD><TD>         0.01</TD><TD>         0.00</TD><TD>        0.69</TD><TD>          106.162</TD><TD>        986.895</TD><TD>          -1.26</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.263</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1002</TD><TD> SB11410_component_1002a</TD><TD>                B1221+0156</TD><TD>  12:21:20.5</TD><TD>    +01:56:12</TD><TD>  185.335574</TD><TD>     1.936906</TD><TD>       0.12</TD><TD>       0.10</TD><TD>        0.0</TD><TD>     16.280</TD><TD>         0.311</TD><TD>    17.651</TD><TD>        0.486</TD><TD>    14.58</TD><TD>    12.24</TD><TD>   95.75</TD><TD>         0.29</TD><TD>         0.06</TD><TD>        4.58</TD><TD>              7.17</TD><TD>            0.00</TD><TD>         -83.72</TD><TD>         0.01</TD><TD>         0.00</TD><TD>        2.04</TD><TD>          309.026</TD><TD>       1757.915</TD><TD>          -1.18</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.470</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1003</TD><TD> SB11410_component_1003a</TD><TD>                B1231-0024</TD><TD>  12:31:12.4</TD><TD>    -00:24:26</TD><TD>  187.801638</TD><TD>    -0.407457</TD><TD>       0.07</TD><TD>       0.06</TD><TD>       -0.0</TD><TD>     16.118</TD><TD>         0.177</TD><TD>    16.503</TD><TD>        0.282</TD><TD>    14.30</TD><TD>    11.78</TD><TD>   85.89</TD><TD>         0.18</TD><TD>         0.04</TD><TD>        2.62</TD><TD>              6.56</TD><TD>            0.00</TD><TD>          87.33</TD><TD>         0.01</TD><TD>         0.00</TD><TD>        1.15</TD><TD>            6.255</TD><TD>        353.700</TD><TD>          -0.53</TD><TD>             -99.00</TD><TD>           0.01</TD><TD>               0.00</TD><TD>       1.174</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1004</TD><TD> SB11410_component_1004a</TD><TD>                B1224+0019</TD><TD>  12:24:12.2</TD><TD>    +00:19:22</TD><TD>  186.050806</TD><TD>     0.322885</TD><TD>       0.07</TD><TD>       0.06</TD><TD>        0.0</TD><TD>     16.284</TD><TD>         0.148</TD><TD>    26.536</TD><TD>        0.323</TD><TD>    18.24</TD><TD>    14.70</TD><TD>  116.77</TD><TD>         0.18</TD><TD>         0.03</TD><TD>        1.75</TD><TD>             13.08</TD><TD>            6.96</TD><TD>         -64.10</TD><TD>         0.00</TD><TD>         0.05</TD><TD>        1.29</TD><TD>           77.692</TD><TD>        832.876</TD><TD>          -1.26</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.574</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1005</TD><TD> SB11410_component_1005a</TD><TD>                B1253+0341</TD><TD>  12:53:41.7</TD><TD>    +03:41:06</TD><TD>  193.423942</TD><TD>     3.685154</TD><TD>       0.04</TD><TD>       0.03</TD><TD>        0.0</TD><TD>     16.656</TD><TD>         0.110</TD><TD>    16.646</TD><TD>        0.174</TD><TD>    14.08</TD><TD>    11.68</TD><TD>  101.24</TD><TD>         0.11</TD><TD>         0.02</TD><TD>        1.54</TD><TD>              6.10</TD><TD>            0.00</TD><TD>         -78.78</TD><TD>         0.01</TD><TD>         0.00</TD><TD>        0.67</TD><TD>            4.173</TD><TD>        280.597</TD><TD>           1.63</TD><TD>             -99.00</TD><TD>           0.01</TD><TD>               0.00</TD><TD>       0.924</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1006</TD><TD> SB11410_component_1006a</TD><TD>                B1221+0331</TD><TD>  12:21:34.4</TD><TD>    +03:31:48</TD><TD>  185.393353</TD><TD>     3.530074</TD><TD>       0.05</TD><TD>       0.04</TD><TD>        0.0</TD><TD>     16.138</TD><TD>         0.119</TD><TD>    20.264</TD><TD>        0.216</TD><TD>    15.38</TD><TD>    13.43</TD><TD>   53.39</TD><TD>         0.13</TD><TD>         0.02</TD><TD>        2.43</TD><TD>              8.48</TD><TD>            3.99</TD><TD>          57.03</TD><TD>         0.00</TD><TD>         0.10</TD><TD>        1.00</TD><TD>           10.625</TD><TD>        389.605</TD><TD>           0.47</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.829</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1007</TD><TD> SB11410_component_1007a</TD><TD>                B1234-0308</TD><TD>  12:34:10.0</TD><TD>    -03:08:36</TD><TD>  188.541820</TD><TD>    -3.143360</TD><TD>       0.11</TD><TD>       0.09</TD><TD>       -0.0</TD><TD>     15.564</TD><TD>         0.219</TD><TD>    24.649</TD><TD>        0.459</TD><TD>    19.74</TD><TD>    13.20</TD><TD>   52.97</TD><TD>         0.30</TD><TD>         0.03</TD><TD>        1.40</TD><TD>             14.99</TD><TD>            3.16</TD><TD>          53.91</TD><TD>         0.00</TD><TD>         0.36</TD><TD>        2.16</TD><TD>         1514.017</TD><TD>       3177.019</TD><TD>          -1.00</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.226</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       1</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1008</TD><TD> SB11410_component_1008a</TD><TD>                B1250-0154</TD><TD>  12:50:16.9</TD><TD>    -01:54:39</TD><TD>  192.570571</TD><TD>    -1.911075</TD><TD>       0.02</TD><TD>       0.01</TD><TD>       -0.0</TD><TD>     16.237</TD><TD>         0.046</TD><TD>    14.925</TD><TD>        0.063</TD><TD>    13.34</TD><TD>    11.34</TD><TD>   83.44</TD><TD>         0.04</TD><TD>         0.01</TD><TD>        0.72</TD><TD>              4.03</TD><TD>            0.00</TD><TD>          85.58</TD><TD>         0.01</TD><TD>         0.00</TD><TD>        0.27</TD><TD>           11.346</TD><TD>        383.854</TD><TD>          -1.04</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.292</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1009</TD><TD> SB11410_component_1009a</TD><TD>                B1244+0050</TD><TD>  12:44:46.9</TD><TD>    +00:50:15</TD><TD>  191.195363</TD><TD>     0.837737</TD><TD>       0.03</TD><TD>       0.02</TD><TD>        0.0</TD><TD>     16.243</TD><TD>         0.073</TD><TD>    16.171</TD><TD>        0.106</TD><TD>    14.02</TD><TD>    11.69</TD><TD>   80.11</TD><TD>         0.06</TD><TD>         0.01</TD><TD>        1.02</TD><TD>              5.89</TD><TD>            0.00</TD><TD>          82.20</TD><TD>         0.00</TD><TD>         0.00</TD><TD>        0.46</TD><TD>           23.211</TD><TD>        542.046</TD><TD>          -0.10</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.342</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD>  SB11410_island_100</TD><TD>  SB11410_component_100a</TD><TD>                B1227-0352</TD><TD>  12:27:58.2</TD><TD>    -03:52:18</TD><TD>  186.992506</TD><TD>    -3.871784</TD><TD>       0.01</TD><TD>       0.01</TD><TD>       -0.0</TD><TD>    135.427</TD><TD>         0.195</TD><TD>   127.593</TD><TD>        0.269</TD><TD>    13.12</TD><TD>    11.81</TD><TD>   80.40</TD><TD>         0.02</TD><TD>         0.00</TD><TD>        0.56</TD><TD>              3.23</TD><TD>            0.00</TD><TD>          83.94</TD><TD>         0.01</TD><TD>         0.00</TD><TD>        0.14</TD><TD>          384.099</TD><TD>       1621.979</TD><TD>          -0.56</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.312</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1010</TD><TD> SB11410_component_1010a</TD><TD>                B1246-0435</TD><TD>  12:46:55.3</TD><TD>    -04:35:41</TD><TD>  191.730339</TD><TD>    -4.594763</TD><TD>       0.37</TD><TD>       0.14</TD><TD>       -0.0</TD><TD>     13.784</TD><TD>         0.380</TD><TD>    31.688</TD><TD>        1.083</TD><TD>    31.34</TD><TD>    12.07</TD><TD>   89.39</TD><TD>         0.96</TD><TD>         0.04</TD><TD>        1.13</TD><TD>             28.66</TD><TD>            0.00</TD><TD>          89.48</TD><TD>         0.00</TD><TD>         0.00</TD><TD>        3.20</TD><TD>          992.779</TD><TD>       2711.811</TD><TD>          -0.94</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.528</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD> SB11410_island_1011</TD><TD> SB11410_component_1011a</TD><TD>                B1236-0159</TD><TD>  12:36:02.5</TD><TD>    -01:59:09</TD><TD>  189.0104</TD><TD>     -1.9861</TD><TD>       0.06</TD><TD>       0.05</TD><TD>        0.0</TD><TD>     16.249</TD><TD>         0.155</TD><TD>    16.261</TD><TD>        0.226</TD><TD>    13.83</TD><TD>    11.91</TD><TD>   80.57</TD><TD>         0.13</TD><TD>         0.03</TD><TD>        2.61</TD><TD>              5.43</TD><TD>            0.00</TD><TD>          83.01</TD><TD>         0.01</TD><TD>         0.00</TD><TD>        0.99</TD><TD>          239.479</TD><TD>       1517.459</TD><TD>          -0.97</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>       0.266</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        </TABLEDATA>
+      </DATA>
+    </TABLE>
+  </RESOURCE>
+</VOTABLE>
