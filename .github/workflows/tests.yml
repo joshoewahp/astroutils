@@ -20,4 +20,4 @@ jobs:
         with:
           poetry-version: 1.1.7
       - run: poetry install
-      - run: poetry run coverage run -m unittest -b tests/test_*.py
+      - run: poetry run pytest --cov=.

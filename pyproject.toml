@@ -18,9 +18,16 @@ click = "^8.0.4"
 pytest = "^5.2"
 coverage = "^6.3.2"
 mypy = "^0.941"
+pytest-mock = "^3.7.0"
+pytest-cov = "^3.0.0"
 
 [tool.poetry.scripts]
 astroutils-build-fields = "astroutils.cli.build_fields:main"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::astropy.wcs.FITSFixedWarning",
+]
 
 [tool.pyright]
 reportMissingTypeStubs = false
