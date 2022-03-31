@@ -22,6 +22,8 @@ logger = logging.getLogger(__name__)
 class FITSException(Exception):
     pass
 
+class DataError(Exception):
+    pass
 
 def get_config() -> configparser.ConfigParser:
     """Load config.ini to expose required absolute paths."""
