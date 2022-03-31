@@ -1,3 +1,4 @@
+import re
 import logging
 import astropy.units as u
 import numpy as np
@@ -40,19 +41,22 @@ class SelavyCatalogue:
         else:
             components = pd.read_fwf(selavypath, skiprows=[1]).drop(columns=['#'])
 
+        pattern = re.compile(r'\S*(\d{4}[+-]\d{2})\S*')
+
         components['sign'] = -1 if (selavypath.name[0] == 'n' or 'nimage' in selavypath.name) else 1
+        components['field'] = pattern.sub(r'\1', str(selavypath))
 
         return components
 
     @classmethod
-    def from_params(cls, epoch: str, field: str, stokes: str):
+    def from_params(cls, epoch: str, stokes: str, field: str=''):
         survey = get_survey(epoch)
 
         selavypath = Path(survey[f'selavy_path_{stokes}'])
         # First try locating catalogues in xml format, then try txt format
-        selavy_files = list(selavypath.glob(f'*{field}*components.xml'))
+        selavy_files = list(selavypath.glob(f'*[._]{field}*components.xml'))
         if len(selavy_files) == 0:
-            selavy_files = list(selavypath.glob(f'*{field}*components.txt'))
+            selavy_files = list(selavypath.glob(f'*[._]{field}*components.txt'))
 
         if len(selavy_files) == 0:
             raise FileNotFoundError(f"Could not locate selavy files at {selavypath} in either xml or txt format.")
