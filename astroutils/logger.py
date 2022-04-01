@@ -14,6 +14,7 @@ def setupLogger(verbose: bool, filename: Optional[str]=None) -> None:
 
     # Turn off some bothersome verbose logging modules
     logging.getLogger('matplotlib').setLevel(logging.WARNING)
+    logging.getLogger('PIL').setLevel(logging.WARNING)
     logging.getLogger('urllib').setLevel(logging.WARNING)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
     logging.getLogger('lightkurve').setLevel(logging.CRITICAL)

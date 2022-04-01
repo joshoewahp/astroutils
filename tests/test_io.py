@@ -183,8 +183,8 @@ def test_multi_field_survey_with_fieldname_no_sbid(surveyname, testdata_dir, num
     fields = build_field_csv(surveyname)
 
     assert len(fields) == num_fields
-    assert list(fields.field) == field_list
-    assert list(fields.sbid) == sbid_list
+    assert sorted(list(fields.field)) == sorted(field_list)
+    assert sorted(list(fields.sbid)) == sorted(sbid_list)
 
 
 def test_field_with_no_fieldname_or_sbid_raises_error(mocker):
