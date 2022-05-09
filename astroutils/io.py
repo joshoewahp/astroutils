@@ -58,14 +58,17 @@ def get_surveys() -> pd.DataFrame:
     return surveys
 
 
-def get_survey(epoch: str) -> pd.Series:
+def get_survey(epoch: str, is_name=False) -> pd.Series:
     """Get a single survey epoch from surveys.json."""
 
     surveys = get_surveys()
-    if epoch not in surveys.survey.values:
+
+    column = 'name' if is_name else 'survey'
+    
+    if epoch not in surveys[column].values:
         raise NotImplementedError(f"{epoch} not a valid survey in surveys.json")
 
-    survey = surveys[surveys.survey == epoch].iloc[0]
+    survey = surveys[surveys[column] == epoch].iloc[0]
         
     return survey
 

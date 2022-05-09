@@ -59,10 +59,23 @@ def test_invalid_system_raises_error(mocker):
 
 surveys = pd.read_json(SURVEYS_PATH).survey
 @pytest.mark.parametrize("survey", list(surveys))
-def test_valid_survey_names(survey, mocker):
+def test_valid_survey_using_survey_codes(survey, mocker):
     mocker.patch('astroutils.io.os.uname', return_value=['', 'ada.physics.usyd.edu.au']) 
 
     survey = get_survey(survey)
+
+    # Should be a single survey (Series)
+    assert isinstance(survey, pd.Series)
+
+    # Check each survey has 24 parameters
+    assert len(survey) == 24
+
+surveys = pd.read_json(SURVEYS_PATH).name
+@pytest.mark.parametrize("survey", list(surveys))
+def test_valid_survey_using_names(survey, mocker):
+    mocker.patch('astroutils.io.os.uname', return_value=['', 'ada.physics.usyd.edu.au']) 
+
+    survey = get_survey(survey, is_name=True)
 
     # Should be a single survey (Series)
     assert isinstance(survey, pd.Series)

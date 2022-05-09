@@ -784,7 +784,6 @@
     "survey": "racs-mid",
     "name": "RACS Mid",
     "ada_root": "/import/ada2/kros9503/data/RACS-mid/EPOCH14/",
-    "nimbus_root": "/data/pilot/EPOCH01/",
     "selavy_path_i": "TILES/STOKESI_SELAVY/",
     "image_path_i": "TILES/STOKESI_IMAGES/",
     "selavy_path_v": "TILES/STOKESV_SELAVY/",
