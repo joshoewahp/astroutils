@@ -1,5 +1,6 @@
 import pytest
 import astropy.units as u
+import numpy as np
 import pandas as pd
 from astropy.coordinates import SkyCoord
 from pathlib import Path
@@ -63,6 +64,7 @@ def validate_selavy_catalogue(cat, n_expected_rows):
 
 txt_path = 'tests/data/RACS_0000-12A.EPOCH00.I.selavy.components.txt'
 xml_path = 'tests/data/VAST_0012+00A.EPOCH12.I.selavy.components.xml'
+stokesv_path = 'tests/data/nimage.v.VAST_0021+00.SB29580.cont.taylor.0.restored.conv.components.xml'
 
 @pytest.mark.parametrize(
     "path, num_components",
@@ -126,6 +128,13 @@ def test_selavy_nearest_component_when_not_in_radius(survey):
     component = cat.nearest_component(position_ra0, radius=15*u.arcsec)
 
     assert component is None
+
+@pytest.mark.parametrize("column", ["flux_peak", "flux_peak_err", "flux_int", "flux_int_err"])
+def test_selavy_negative_fluxes_corrected(column, survey):
+
+    cat = SelavyCatalogue(stokesv_path)
+
+    assert np.all(cat.components[column] > 0)
 
 
 # Condon Flux Error

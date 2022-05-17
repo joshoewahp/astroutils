@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class SelavyCatalogue:
 
-    def __init__(self, selavypath: Union[str, Path, list[str], list[Path]]):
+    def __init__(self, selavypath: Union[str, Path, list[str], list[Path]], correct_negative=True):
 
         if isinstance(selavypath, str):
             selavypath = [Path(selavypath)]
@@ -28,6 +28,8 @@ class SelavyCatalogue:
 
         self.selavypath = cast(list[Path], selavypath)
         self.components = pd.concat([self._load(p) for p in self.selavypath])
+        if correct_negative:
+            self._correct_negative_fluxes()
 
     def _load(self, selavypath: Path) -> pd.DataFrame:
         """Import selavy catalogue from multiple source formats to pandas DataFrame."""
@@ -67,7 +69,7 @@ class SelavyCatalogue:
     def from_aegean(cls, aegeanpath: Union[str, Path]):
         """Load Aegean source cat and convert to selavy format."""
 
-        cat = cls(aegeanpath)
+        cat = cls(aegeanpath, correct_negative=False)
 
         columns = {
             'island': 'island_id',
@@ -113,6 +115,12 @@ class SelavyCatalogue:
 
         return components[components.d2d < radius.to(u.arcsec)]
 
+    def _correct_negative_fluxes(self):
+        """Correct recent selavy update that writes fluxes as negative values for flagNegative runs."""
+
+        for col in ['flux_peak', 'flux_peak_err', 'flux_int', 'flux_int_err']:
+            self.components[col] = self.components[col].abs()
+    
     def nearest_component(self, position: SkyCoord, radius: u.Quantity) -> Union[pd.Series, None]:
         """Return closest SelavyComponent within radius of position."""
 

@@ -67,8 +67,8 @@ def test_valid_survey_using_survey_codes(survey, mocker):
     # Should be a single survey (Series)
     assert isinstance(survey, pd.Series)
 
-    # Check each survey has 24 parameters
-    assert len(survey) == 24
+    # Check each survey has 23 parameters
+    assert len(survey) == 23
 
 surveys = pd.read_json(SURVEYS_PATH).name
 @pytest.mark.parametrize("survey", list(surveys))
@@ -80,8 +80,8 @@ def test_valid_survey_using_names(survey, mocker):
     # Should be a single survey (Series)
     assert isinstance(survey, pd.Series)
 
-    # Check each survey has 24 parameters
-    assert len(survey) == 24
+    # Check each survey has 23 parameters
+    assert len(survey) == 23
 
 
 def test_invalid_survey_name_raises_not_implemented_error(mocker):

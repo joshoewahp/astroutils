@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<VOTABLE version="1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
+ xmlns:stc="http://www.ivoa.net/xml/STC/v1.30" >
+  <COOSYS ID="J2000" equinox="J2000" system="eq_FK5"/>
+  <RESOURCE name="Component catalogue from Selavy source finding">
+    <TABLE name="Component catalogue">
+      <DESCRIPTION></DESCRIPTION>
+      <PARAM name="table_version" ucd="meta.version" datatype="char" arraysize="43" value="casda.continuum_component_description_v1.9"/>
+      <PARAM name="imageFile" ucd="meta.file;meta.fits" datatype="char" arraysize="79" value="data/test_2_data//image.v.VAST_0021+00.SB29580.cont.taylor.0.restored.conv.fits"/>
+      <PARAM name="flagSubsection" ucd="meta.code" datatype="boolean" value="1"/>
+      <PARAM name="subsection" ucd="" datatype="char" arraysize="25" value="[1:15050,1:13148,1:1,1:1]"/>
+      <PARAM name="flagStatSec" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="StatSec" ucd="" datatype="char" arraysize="7" value="[*,*,*]"/>
+      <PARAM name="searchType" ucd="meta.note" datatype="char" arraysize="7" value="spatial"/>
+      <PARAM name="flagNegative" ucd="meta.code" datatype="boolean" value="1"/>
+      <PARAM name="flagBaseline" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="flagRobustStats" ucd="meta.code" datatype="boolean" value="1"/>
+      <PARAM name="flagFDR" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="threshold" ucd="phot.flux;stat.min" datatype="float" value="5"/>
+      <PARAM name="flagGrowth" ucd="meta.code" datatype="boolean" value="1"/>
+      <PARAM name="growthThreshold" ucd="phot.flux;stat.min" datatype="float" value="3"/>
+      <PARAM name="minPix" ucd="" datatype="int" value="3"/>
+      <PARAM name="minChannels" ucd="" datatype="int" value="0"/>
+      <PARAM name="minVoxels" ucd="" datatype="int" value="3"/>
+      <PARAM name="flagAdjacent" ucd="meta.code" datatype="boolean" value="1"/>
+      <PARAM name="threshVelocity" ucd="" datatype="float" value="7"/>
+      <PARAM name="flagRejectBeforeMerge" ucd="" datatype="boolean" value="0"/>
+      <PARAM name="flagTwoStageMerging" ucd="" datatype="boolean" value="1"/>
+      <PARAM name="pixelCentre" ucd="" datatype="char" arraysize="8" value="centroid"/>
+      <PARAM name="flagSmooth" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="flagATrous" ucd="meta.code" datatype="boolean" value="0"/>
+      <PARAM name="Reference frequency" ucd="em.freq;meta.main" datatype="float" unit="Hz" value="1.36749e+09"/>
+      <PARAM name="thresholdActual" ucd="" datatype="float" unit="Jy/beam" value="5"/>
+      <FIELD name="island_id" ID="col_island_id" ucd="meta.id.parent" datatype="char" unit="--" arraysize="18"/>
+      <FIELD name="component_id" ID="col_component_id" ucd="meta.id;meta.main" datatype="char" unit="--" arraysize="22"/>
+      <FIELD name="component_name" ID="col_component_name" ucd="meta.id" datatype="char" unit="" arraysize="26"/>
+      <FIELD name="ra_hms_cont" ID="col_ra_hms_cont" ucd="pos.eq.ra" ref="J2000" datatype="char" unit="" arraysize="12"/>
+      <FIELD name="dec_dms_cont" ID="col_dec_dms_cont" ucd="pos.eq.dec" ref="J2000" datatype="char" unit="" arraysize="13"/>
+      <FIELD name="ra_deg_cont" ID="col_ra_deg_cont" ucd="pos.eq.ra;meta.main" ref="J2000" datatype="double" unit="deg" width="12" precision="6"/>
+      <FIELD name="dec_deg_cont" ID="col_dec_deg_cont" ucd="pos.eq.dec;meta.main" ref="J2000" datatype="double" unit="deg" width="13" precision="6"/>
+      <FIELD name="ra_err" ID="col_ra_err" ucd="stat.error;pos.eq.ra" ref="J2000" datatype="float" unit="arcsec" width="11" precision="2"/>
+      <FIELD name="dec_err" ID="col_dec_err" ucd="stat.error;pos.eq.dec" ref="J2000" datatype="float" unit="arcsec" width="11" precision="2"/>
+      <FIELD name="freq" ID="col_freq" ucd="em.freq" datatype="float" unit="MHz" width="11" precision="1"/>
+      <FIELD name="flux_peak" ID="col_flux_peak" ucd="phot.flux.density;stat.max;em.radio;stat.fit" datatype="float" unit="mJy/beam" width="11" precision="6"/>
+      <FIELD name="flux_peak_err" ID="col_flux_peak_err" ucd="stat.error;phot.flux.density;stat.max;em.radio;stat.fit" datatype="float" unit="mJy/beam" width="14" precision="6"/>
+      <FIELD name="flux_int" ID="col_flux_int" ucd="phot.flux.density;em.radio;stat.fit" datatype="float" unit="mJy" width="10" precision="6"/>
+      <FIELD name="flux_int_err" ID="col_flux_int_err" ucd="stat.error;phot.flux.density;em.radio;stat.fit" datatype="float" unit="mJy" width="13" precision="6"/>
+      <FIELD name="maj_axis" ID="col_maj_axis" ucd="phys.angSize.smajAxis;em.radio;stat.fit" datatype="float" unit="arcsec" width="9" precision="2"/>
+      <FIELD name="min_axis" ID="col_min_axis" ucd="phys.angSize.sminAxis;em.radio;stat.fit" datatype="float" unit="arcsec" width="9" precision="2"/>
+      <FIELD name="pos_ang" ID="col_pos_ang" ucd="phys.angSize;pos.posAng;em.radio;stat.fit" datatype="float" unit="deg" width="8" precision="2"/>
+      <FIELD name="maj_axis_err" ID="col_maj_axis_err" ucd="stat.error;phys.angSize.smajAxis;em.radio" datatype="float" unit="arcsec" width="13" precision="2"/>
+      <FIELD name="min_axis_err" ID="col_min_axis_err" ucd="stat.error;phys.angSize.sminAxis;em.radio" datatype="float" unit="arcsec" width="13" precision="2"/>
+      <FIELD name="pos_ang_err" ID="col_pos_ang_err" ucd="stat.error;phys.angSize;pos.posAng;em.radio" datatype="float" unit="deg" width="12" precision="2"/>
+      <FIELD name="maj_axis_deconv" ID="col_maj_axis_deconv" ucd="phys.angSize.smajAxis;em.radio;askap:meta.deconvolved" datatype="float" unit="arcsec" width="18" precision="2"/>
+      <FIELD name="min_axis_deconv" ID="col_min_axis_deconv" ucd="phys.angSize.sminAxis;em.radio;askap:meta.deconvolved" datatype="float" unit="arcsec" width="16" precision="2"/>
+      <FIELD name="pos_ang_deconv" ID="col_pos_ang_deconv" ucd="phys.angSize;pos.posAng;em.radio;askap:meta.deconvolved" datatype="float" unit="deg" width="15" precision="2"/>
+      <FIELD name="maj_axis_deconv_err" ID="col_maj_axis_deconv_err" ucd="stat.error;phys.angSize.smajAxis;em.radio;askap:meta.deconvolved" datatype="float" unit="arcsec" width="13" precision="2"/>
+      <FIELD name="min_axis_deconv_err" ID="col_min_axis_deconv_err" ucd="stat.error;phys.angSize.sminAxis;em.radio;askap:meta.deconvolved" datatype="float" unit="arcsec" width="13" precision="2"/>
+      <FIELD name="pos_ang_deconv_err" ID="col_pos_ang_deconv_err" ucd="stat.error;phys.angSize;pos.posAng;em.radio;askap:meta.deconvolved" datatype="float" unit="deg" width="12" precision="2"/>
+      <FIELD name="chi_squared_fit" ID="col_chi_squared_fit" ucd="stat.fit.chi2" datatype="float" unit="--" width="17" precision="6"/>
+      <FIELD name="rms_fit_gauss" ID="col_rms_fit_gauss" ucd="stat.stdev;stat.fit" datatype="float" unit="mJy/beam" width="15" precision="6"/>
+      <FIELD name="spectral_index" ID="col_spectral_index" ucd="spect.index;em.radio" datatype="float" unit="--" width="15" precision="2"/>
+      <FIELD name="spectral_curvature" ID="col_spectral_curvature" ucd="askap:spect.curvature;em.radio" datatype="float" unit="--" width="19" precision="2"/>
+      <FIELD name="spectral_index_err" ID="col_spectral_index_err" ucd="stat.error;spect.index;em.radio" datatype="float" unit="--" width="15" precision="2"/>
+      <FIELD name="spectral_curvature_err" ID="col_spectral_curvature_err" ucd="stat.error;askap:spect.curvature;em.radio" datatype="float" unit="--" width="19" precision="2"/>
+      <FIELD name="rms_image" ID="col_rms_image" ucd="stat.stdev;phot.flux.density" datatype="float" unit="mJy/beam" width="12" precision="6"/>
+      <FIELD name="has_siblings" ID="col_has_siblings" ucd="meta.code" datatype="int" unit="" width="8"/>
+      <FIELD name="fit_is_estimate" ID="col_fit_is_estimate" ucd="meta.code" datatype="int" unit="" width="8"/>
+      <FIELD name="spectral_index_from_TT" ID="col_spectral_index_from_TT" ucd="meta.code" datatype="int" unit="" width="8"/>
+      <FIELD name="flag_c4" ID="col_flag_c4" ucd="meta.code" datatype="int" unit="" width="8"/>
+      <FIELD name="comment" ID="col_comment" ucd="meta.note" datatype="char" unit="" arraysize="100"/>
+      <DATA>
+        <TABLEDATA>
+        <TR>
+          <TD>  SB29580_island_1</TD><TD>  SB29580_component_1a</TD><TD>            J002225+001456</TD><TD>  00:22:25.4</TD><TD>    +00:14:56</TD><TD>    5.605912</TD><TD>     0.248982</TD><TD>       0.03</TD><TD>       0.02</TD><TD>     1367.5</TD><TD> -12.109197</TD><TD>      0.078245</TD><TD>-13.535155</TD><TD>    -0.189496</TD><TD>    10.43</TD><TD>     8.14</TD><TD>   76.08</TD><TD>         0.07</TD><TD>         0.09</TD><TD>        1.06</TD><TD>              2.97</TD><TD>            2.92</TD><TD>          87.32</TD><TD>        69.15</TD><TD>        71.72</TD><TD>      165.37</TD><TD>        72.844688</TD><TD>     972.643256</TD><TD>         -99.00</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>    0.186395</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD>  SB29580_island_2</TD><TD>  SB29580_component_2a</TD><TD>            J000958+015755</TD><TD>  00:09:58.6</TD><TD>    +01:57:55</TD><TD>    2.494317</TD><TD>     1.965291</TD><TD>       0.09</TD><TD>       0.08</TD><TD>     1367.5</TD><TD>  -7.172081</TD><TD>      0.144374</TD><TD> -9.108038</TD><TD>    -0.407175</TD><TD>    10.99</TD><TD>     8.78</TD><TD>   71.67</TD><TD>         0.25</TD><TD>         0.34</TD><TD>        4.26</TD><TD>              4.83</TD><TD>            4.09</TD><TD>          34.52</TD><TD>         4.13</TD><TD>         6.25</TD><TD>       34.63</TD><TD>        17.159475</TD><TD>     604.231060</TD><TD>         -99.00</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>    0.532712</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD>  SB29580_island_3</TD><TD>  SB29580_component_3a</TD><TD>            J001847-023350</TD><TD>  00:18:47.7</TD><TD>    -02:33:50</TD><TD>    4.698688</TD><TD>    -2.563948</TD><TD>       0.06</TD><TD>       0.05</TD><TD>     1367.5</TD><TD>  -5.381976</TD><TD>      0.064904</TD><TD> -7.379363</TD><TD>    -0.189754</TD><TD>    11.43</TD><TD>     9.12</TD><TD>   76.12</TD><TD>         0.15</TD><TD>         0.21</TD><TD>        2.40</TD><TD>              5.53</TD><TD>            5.04</TD><TD>          77.05</TD><TD>         2.74</TD><TD>         3.51</TD><TD>       21.80</TD><TD>        10.687225</TD><TD>     440.809697</TD><TD>         -99.00</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>    0.349681</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD>  SB29580_island_4</TD><TD>  SB29580_component_4a</TD><TD>            J002021-023311</TD><TD>  00:20:21.8</TD><TD>    -02:33:11</TD><TD>    5.091032</TD><TD>    -2.553330</TD><TD>       0.06</TD><TD>       0.06</TD><TD>     1367.5</TD><TD>  -5.200884</TD><TD>      0.063267</TD><TD> -6.886851</TD><TD>    -0.201104</TD><TD>    11.74</TD><TD>     8.57</TD><TD>   53.22</TD><TD>         0.17</TD><TD>         0.23</TD><TD>        1.84</TD><TD>              7.06</TD><TD>            1.93</TD><TD>          32.78</TD><TD>         0.13</TD><TD>         3.15</TD><TD>        3.00</TD><TD>         9.890774</TD><TD>     360.751659</TD><TD>         -99.00</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>    0.384544</TD><TD>       1</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD>  SB29580_island_4</TD><TD>  SB29580_component_4b</TD><TD>            J002021-023300</TD><TD>  00:20:21.6</TD><TD>    -02:33:00</TD><TD>    5.089795</TD><TD>    -2.550128</TD><TD>       0.09</TD><TD>       0.10</TD><TD>     1367.5</TD><TD>  -3.517776</TD><TD>      0.071271</TD><TD> -4.077613</TD><TD>    -0.236555</TD><TD>    11.31</TD><TD>     7.79</TD><TD>   43.13</TD><TD>         0.35</TD><TD>         0.39</TD><TD>        3.17</TD><TD>              6.85</TD><TD>            0.00</TD><TD>          24.26</TD><TD>         0.12</TD><TD>         0.00</TD><TD>        3.86</TD><TD>         9.890774</TD><TD>     360.751659</TD><TD>         -99.00</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>    0.384544</TD><TD>       1</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD>  SB29580_island_5</TD><TD>  SB29580_component_5a</TD><TD>            J000853+014318</TD><TD>  00:08:53.6</TD><TD>    +01:43:18</TD><TD>    2.223159</TD><TD>     1.721848</TD><TD>       0.08</TD><TD>       0.07</TD><TD>     1367.5</TD><TD>  -3.816165</TD><TD>      0.055339</TD><TD> -4.083406</TD><TD>    -0.259108</TD><TD>    11.72</TD><TD>     6.94</TD><TD>   53.94</TD><TD>         0.40</TD><TD>         0.37</TD><TD>        2.05</TD><TD>              6.84</TD><TD>            0.00</TD><TD>          40.68</TD><TD>         0.20</TD><TD>         0.00</TD><TD>        3.25</TD><TD>         0.151575</TD><TD>     104.051933</TD><TD>         -99.00</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>    0.648452</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        <TR>
+          <TD>  SB29580_island_6</TD><TD>  SB29580_component_6a</TD><TD>            J001616-024037</TD><TD>  00:16:16.1</TD><TD>    -02:40:37</TD><TD>    4.067152</TD><TD>    -2.677075</TD><TD>       0.11</TD><TD>       0.07</TD><TD>     1367.5</TD><TD>  -3.117949</TD><TD>      0.052452</TD><TD> -3.307811</TD><TD>    -0.270131</TD><TD>    12.86</TD><TD>     6.27</TD><TD>   63.90</TD><TD>         0.54</TD><TD>         0.44</TD><TD>        2.34</TD><TD>              8.25</TD><TD>            0.00</TD><TD>          58.29</TD><TD>         0.19</TD><TD>         0.00</TD><TD>        3.37</TD><TD>         0.051169</TD><TD>      71.532555</TD><TD>         -99.00</TD><TD>             -99.00</TD><TD>           0.00</TD><TD>               0.00</TD><TD>    0.625396</TD><TD>       0</TD><TD>       0</TD><TD>       1</TD><TD>       0</TD><TD>                                                                                                    </TD>
+        </TR>
+        </TABLEDATA>
+      </DATA>
+    </TABLE>
+  </RESOURCE>
+</VOTABLE>
