@@ -869,9 +869,9 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "racs-mid",
+    "survey": "racs-mid-honours",
     "name": "RACS Mid",
-    "ada_root": "/import/ada2/kros9503/data/RACS-mid/EPOCH14/",
+    "ada_root": "/import/ada2/kros9503/data/RACS-mid-honours/EPOCH14/",
     "selavy_path_i": "TILES/STOKESI_SELAVY/",
     "image_path_i": "TILES/STOKESI_IMAGES/",
     "selavy_path_v": "TILES/STOKESV_SELAVY/",
