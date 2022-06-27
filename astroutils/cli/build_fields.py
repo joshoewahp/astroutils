@@ -1,7 +1,8 @@
 import click
 import logging
+from pathlib import Path
 
-from astroutils.io import build_field_csv, get_config
+from astroutils.io import build_field_csv, build_vlass_field_csv, get_config
 from astroutils.logger import setupLogger
 
 config = get_config()
@@ -16,7 +17,12 @@ def main(epoch, verbose):
 
     setupLogger(verbose)
     
-    fields = build_field_csv(epoch)
+    if str(epoch) == 'vlass':
+        base_dir = Path('/import/ada2/vlass/')
+        fields = build_vlass_field_csv(base_dir)
+    else:
+        fields = build_field_csv(epoch)
+
     fields.to_csv(f'{aux_path}/fields/{epoch}_fields.csv', index=False)
 
     logger.info(f"Created field metadata csv for {epoch}:\n{fields}")

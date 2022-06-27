@@ -189,18 +189,21 @@ def build_vlass_field_csv(base_dir: Path) -> pd.DataFrame:
 
     pattern = re.compile(r'\S+(J\d{6}[-+]\d{6})\S+')
     fields = list(base_dir.rglob("*subim.fits"))
+    
     names = [f.parts[-1] for f in fields]
+
     df = pd.DataFrame({
         'image': names,
+        'imagedir': [f.parts[-2] for f in fields],
+        'tile': [f.parts[-3] for f in fields],
         'coord': [pattern.sub(r'\1', name) for name in names],
-        'epoch': [f.parts[4] for f in fields],
-        'tile': [f.parts[5] for f in fields],
     })
 
     vals = []
     for _, row in df.iterrows():
 
-        with fits.open(f'{base_dir}/{row.epoch}/{row.tile}/{row.image}') as hdul:
+        path = f'{base_dir}/{row.tile}/{row.imagedir}/{row.image}'
+        with fits.open(path) as hdul:
             header = hdul[0].header
             w = WCS(header, naxis=2)
             size_x = header["NAXIS1"]
