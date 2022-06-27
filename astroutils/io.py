@@ -141,6 +141,7 @@ def build_field_csv(epoch: str) -> pd.DataFrame:
     for i_path in i_paths:
 
         str_path = str(i_path)
+        logger.debug(f"Reading image at {str_path}")
 
         # Try to parse field coordinate pattern first, then default to SBID pattern
         field = pattern.sub(r'\1', str_path)
@@ -169,7 +170,7 @@ def build_field_csv(epoch: str) -> pd.DataFrame:
         params = {
             'field': field,
             'sbid': sbid,
-            'str_path': str_path,
+            'i_path': str_path,
             'v_path': v_path,
             'cr_ra_pix': centre[0][0],
             'cr_dec_pix': centre[0][1],
@@ -210,6 +211,7 @@ def build_vlass_field_csv(base_dir: Path) -> pd.DataFrame:
 
             vals.append({
                 'image': row.image,
+                'i_path': path,
                 'cr_ra_pix': centre[0][0],
                 'cr_dec_pix': centre[0][1],
                 'date': header['DATE-OBS']
