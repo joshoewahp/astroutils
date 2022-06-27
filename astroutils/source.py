@@ -51,15 +51,25 @@ class SelavyCatalogue:
         return components
 
     @classmethod
-    def from_params(cls, epoch: str, stokes: str, field: str=''):
+    def from_params(cls, epoch: str, stokes: str, fields: Union[str,list[str]]=''):
+
+        if isinstance(fields, str):
+            fields = [fields]
+        
         survey = get_survey(epoch)
 
         selavypath = Path(survey[f'selavy_path_{stokes}'])
-        # First try locating catalogues in xml format, then try txt format
-        selavy_files = list(selavypath.glob(f'*[._]{field}*components.xml'))
-        if len(selavy_files) == 0:
-            selavy_files = list(selavypath.glob(f'*[._]{field}*components.txt'))
+        selavy_files = []
 
+        for field in fields:
+
+            # First try locating catalogues in xml format, then try txt format
+            files = list(selavypath.glob(f'*[._]{field}*components.xml'))
+            if len(files) == 0:
+                files = list(selavypath.glob(f'*[._]{field}*components.txt'))
+
+            selavy_files.extend(files)
+            
         if len(selavy_files) == 0:
             raise FileNotFoundError(f"Could not locate selavy files at {selavypath} in either xml or txt format.")
 

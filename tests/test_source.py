@@ -84,18 +84,19 @@ def test_selavy_path_parsing(path, num_components, survey):
     "surveyname, field, stokes, num_components",
     [
         ('racs-low', '0000-12', 'i', 15),
+        ('racs-low', ['0000-12', '1200-74'], 'i', 28),
         ('vastp1', '0012+00', 'i', 23),
     ]
 )
 def test_selavy_from_params(surveyname, field, stokes, num_components, survey):
-    cat = SelavyCatalogue.from_params(surveyname, stokes=stokes, field=field)
+    cat = SelavyCatalogue.from_params(surveyname, stokes=stokes, fields=field)
 
     validate_selavy_catalogue(cat, num_components)
 
 def test_selavy_from_params_raises_error_if_no_path(survey):
 
     with pytest.raises(FileNotFoundError):
-        SelavyCatalogue.from_params(epoch='vastp1', field='0012+10', stokes='i')
+        SelavyCatalogue.from_params(epoch='vastp1', fields='0012+10', stokes='i')
         
 def test_selavy_from_aegean(survey):
     cat = SelavyCatalogue.from_aegean('tests/data/mwats_test.parq')
