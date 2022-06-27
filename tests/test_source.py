@@ -120,7 +120,7 @@ def test_selavy_nearest_component_when_in_radius(survey):
     position_ra0 = SkyCoord(ra=0, dec=-11, unit=u.deg)
     component = cat.nearest_component(position_ra0, radius=1*u.deg)
 
-    assert len(component) == 41
+    assert len(component) == 42
 
 def test_selavy_nearest_component_when_not_in_radius(survey):
 
