@@ -44,9 +44,11 @@ class SelavyCatalogue:
             components = pd.read_fwf(selavypath, skiprows=[1]).drop(columns=['#'])
 
         pattern = re.compile(r'\S*(\d{4}[+-]\d{2})\S*')
+        sbidpattern = re.compile(r'\S*SB(\d{4,5})\S*')
 
         components['sign'] = -1 if (selavypath.name[0] == 'n' or 'nimage' in selavypath.name) else 1
         components['field'] = pattern.sub(r'\1', str(selavypath))
+        components['sbid'] = sbidpattern.sub(r'\1', str(selavypath))
 
         return components
 
