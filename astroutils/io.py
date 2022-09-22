@@ -1,4 +1,5 @@
 import configparser
+import glob
 import logging
 import os
 import re
@@ -10,6 +11,7 @@ from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.wcs import WCS, FITSFixedWarning
 from pathlib import Path
+from typing import Union
 
 warnings.filterwarnings('ignore', category=FITSFixedWarning, append=True)
 
@@ -45,14 +47,30 @@ def get_surveys() -> pd.DataFrame:
     # Import survey data from JSON file, remove any already saved
     surveys = pd.read_json(SURVEYS_PATH)
 
+    # Read system name to resolve base path
     system = os.uname()[1]
-    for col in ["selavy_path_i", "image_path_i", "selavy_path_v", "image_path_v"]:
-        if system == "ada.physics.usyd.edu.au":
-            surveys[col] = surveys.ada_root + surveys[col]
-        elif system == 'vast-data':
-            surveys[col] = surveys.nimbus_root + surveys[col]
-        else:
-            raise NotImplementedError(f"Data paths unknown for hostname {system}")
+    if system == "ada.physics.usyd.edu.au":
+        surveys['data_path'] = surveys.ada_root
+    elif system == 'vast-data':
+        surveys['data_path'] = surveys.nimbus_root
+    else:
+        raise NotImplementedError(f"Data paths unknown for hostname {system}")
+
+    # Populate all relevant data paths
+    def update(row):
+        row['image_path_i_C'] = (row.data_path + 'COMBINED/STOKESI_IMAGES/') if row.combined_I else ''
+        row['selavy_path_i_C'] = (row.data_path + 'COMBINED/STOKESI_SELAVY/') if row.combined_I else ''
+        row['image_path_v_C'] = (row.data_path + 'COMBINED/STOKESV_IMAGES/') if row.combined_V else ''
+        row['selavy_path_v_C'] = (row.data_path + 'COMBINED/STOKESV_SELAVY/') if row.combined_V else ''
+        row['image_path_i_T'] = (row.data_path + 'TILES/STOKESI_IMAGES/') if row.tiles_I else ''
+        row['selavy_path_i_T'] = (row.data_path + 'TILES/STOKESI_SELAVY/') if row.tiles_I else ''
+        row['image_path_v_T'] = (row.data_path + 'TILES/STOKESV_IMAGES/') if row.tiles_V else ''
+        row['selavy_path_v_T'] = (row.data_path + 'TILES/STOKESV_SELAVY/') if row.tiles_V else ''
+
+        return row
+
+    surveys = surveys.apply(update, axis=1)
+
     surveys.drop(columns=['ada_root', 'nimbus_root'], inplace=True)
 
     return surveys
@@ -87,27 +105,29 @@ def get_image_data_header(image_path: Path, load_data: bool=True):
     return data, header
 
 
-def get_image_from_survey_params(epoch: pd.Series, field: str, stokes: str, load: bool=True):
+def get_image_from_survey_params(epoch: pd.Series, field: str, stokes: str, tiletype: str, load: bool=True):
     """Get image header and data for a given field, epoch, and Stokes parameter."""
 
-    image_path = list(Path(epoch[f'image_path_{stokes}']).glob(f'*{field}*.fits'))[0]
+    image_path = list(Path(epoch[f'image_path_{stokes}_{tiletype[0]}']).glob(f'*{field}*.fits'))[0]
     data, header = get_image_data_header(image_path, load_data=load)
 
     return data, header
 
 
-def find_fields(position: SkyCoord, epoch: str) -> pd.DataFrame:
+def find_fields(position: SkyCoord, epoch: str, tiletype: Union[str, None]) -> pd.DataFrame:
     """Return DataFrame of epoch fields containing position."""
 
+    tilestr = f'_{tiletype.lower()}' if tiletype else ''
     try:
-        image_df = pd.read_csv(f'{aux_path}/fields/{epoch}_fields.csv')
+        image_df = pd.read_csv(f'{aux_path}/fields/{epoch}{tilestr}_fields.csv')
     except FileNotFoundError:
+        print(f'{aux_path}/fields/{epoch}{tilestr}_fields.csv')
         raise FITSException(f"Missing field metadata csv for {epoch}.")
     
     beam_centre = SkyCoord(ra=image_df['cr_ra_pix'], dec=image_df['cr_dec_pix'], unit=u.deg)
     image_df['dist_field_centre'] = beam_centre.separation(position).deg
     
-    pbeamsize = 1 * u.deg if epoch == 'vlass' else 5 * u.deg
+    pbeamsize = 1 * u.deg if 'vlass' in epoch else 5 * u.deg
     fields = image_df[image_df.dist_field_centre < pbeamsize].reset_index(drop=True)
 
     return fields
@@ -126,13 +146,13 @@ def parse_image_filenames_in_dir(path: Path, stokes: str) -> list[Path]:
     return image_paths
 
 
-def build_field_csv(epoch: str) -> pd.DataFrame:
+def build_field_csv(epoch: str, tiletype: str='TILES') -> pd.DataFrame:
     """Generate metadata csv for fields from epoch."""
 
     survey = get_survey(epoch)
 
-    i_paths = parse_image_filenames_in_dir(Path(survey.image_path_i), stokes='i')
-    v_paths = parse_image_filenames_in_dir(Path(survey.image_path_v), stokes='v')
+    i_paths = parse_image_filenames_in_dir(Path(survey[f'image_path_i_{tiletype[0]}']), stokes='i')
+    v_paths = parse_image_filenames_in_dir(Path(survey[f'image_path_v_{tiletype[0]}']), stokes='v')
 
     pattern = re.compile(r'\S*(\d{4}[-+]\d{2})\S*')
     sbidpattern = re.compile(r'\S*(SB\d{4,5})\S*')
@@ -161,6 +181,7 @@ def build_field_csv(epoch: str) -> pd.DataFrame:
 
         # Locate coordinates of image pixel centre
         w = WCS(header, naxis=2)
+        date_obs = header["DATE-OBS"]
         size_x = header["NAXIS1"]
         size_y = header["NAXIS2"]
         central_coords = [[size_x / 2., size_y / 2.]]
@@ -170,6 +191,7 @@ def build_field_csv(epoch: str) -> pd.DataFrame:
         params = {
             'field': field,
             'sbid': sbid,
+            'date_obs': date_obs, 
             'i_path': str_path,
             'v_path': v_path,
             'cr_ra_pix': centre[0][0],
@@ -185,10 +207,13 @@ def build_field_csv(epoch: str) -> pd.DataFrame:
     return df.dropna()
 
 
-def build_vlass_field_csv(base_dir: Path) -> pd.DataFrame:
+def build_vlass_field_csv(epoch: str) -> pd.DataFrame:
 
+    survey = get_survey(epoch)
+    base_dir = Path(survey.data_path)
+    
     pattern = re.compile(r'\S+(J\d{6}[-+]\d{6})\S+')
-    fields = list(base_dir.rglob("*subim.fits"))
+    fields = [Path(f) for f in glob.glob(f"{survey.data_path}/**/*.subim.fits", recursive=True)]
     
     names = [f.parts[-1] for f in fields]
 

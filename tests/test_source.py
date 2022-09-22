@@ -17,8 +17,8 @@ from astroutils.source import (
 
 
 mock_survey = pd.Series({
-    'selavy_path_i': 'tests/data',
-    'selavy_path_v': 'tests/data',
+    'selavy_path_i_C': 'tests/data',
+    'selavy_path_v_C': 'tests/data',
 })
 
 @pytest.fixture()
@@ -81,22 +81,22 @@ def test_selavy_path_parsing(path, num_components, survey):
     validate_selavy_catalogue(cat, num_components)
 
 @pytest.mark.parametrize(
-    "surveyname, field, stokes, num_components",
+    "surveyname, field, stokes, tiletype, num_components",
     [
-        ('racs-low', '0000-12', 'i', 15),
-        ('racs-low', ['0000-12', '1200-74'], 'i', 28),
-        ('vastp1', '0012+00', 'i', 23),
+        ('racs-low', '0000-12', 'i', 'COMBINED', 15),
+        ('racs-low', ['0000-12', '1200-74'], 'i', 'COMBINED', 28),
+        ('vastp1', '0012+00', 'i', 'COMBINED', 23),
     ]
 )
-def test_selavy_from_params(surveyname, field, stokes, num_components, survey):
-    cat = SelavyCatalogue.from_params(surveyname, stokes=stokes, fields=field)
+def test_selavy_from_params(surveyname, field, stokes, tiletype, num_components, survey):
+    cat = SelavyCatalogue.from_params(surveyname, stokes=stokes, fields=field, tiletype=tiletype)
 
     validate_selavy_catalogue(cat, num_components)
 
 def test_selavy_from_params_raises_error_if_no_path(survey):
 
     with pytest.raises(FileNotFoundError):
-        SelavyCatalogue.from_params(epoch='vastp1', fields='0012+10', stokes='i')
+        SelavyCatalogue.from_params(epoch='vastp1', fields='0012+10', stokes='i', tiletype='COMBINED')
         
 def test_selavy_from_aegean(survey):
     cat = SelavyCatalogue.from_aegean('tests/data/mwats_test.parq')
@@ -214,8 +214,8 @@ def epochs():
     epochs = pd.DataFrame({
         "survey": ["vastp2", "vastp8"],
         "name": ["VAST P1-2", "VAST P1-8"],
-        "image_path_i": ["COMBINED/STOKESI_IMAGES/", "COMBINED/STOKESI_IMAGES/"],
-        "image_path_v": ["COMBINED/STOKESV_IMAGES/", "COMBINED/STOKESV_IMAGES/"],
+        "image_path_i_C": ["COMBINED/STOKESI_IMAGES/", "COMBINED/STOKESI_IMAGES/"],
+        "image_path_v_C": ["COMBINED/STOKESV_IMAGES/", "COMBINED/STOKESV_IMAGES/"],
     })
     return epochs
 
@@ -252,7 +252,8 @@ def test_measure_flux_value(selavy_path, fields, expected_flux, epochs, mocker):
         epochs,
         size=0.1*u.deg,
         fluxtype='int',
-        stokes='i'
+        stokes='i',
+        tiletype='COMBINED',
     )
 
     assert fluxes.flux.iloc[0].round(3) == expected_flux
@@ -267,7 +268,8 @@ def test_measure_flux_coordinates_with_no_fields(mocker, epochs):
         epochs,
         size=0.1*u.deg,
         fluxtype='int',
-        stokes='i'
+        stokes='i',
+        tiletype='COMBINED',
     )
 
     assert fluxes.empty

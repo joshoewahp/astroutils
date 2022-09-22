@@ -53,14 +53,14 @@ class SelavyCatalogue:
         return components
 
     @classmethod
-    def from_params(cls, epoch: str, stokes: str, fields: Union[str,list[str]]=''):
+    def from_params(cls, epoch: str, stokes: str, tiletype: str, fields: Union[str, list[str]]='', is_name: bool=False):
 
         if isinstance(fields, str):
             fields = [fields]
         
-        survey = get_survey(epoch)
+        survey = get_survey(epoch, is_name)
 
-        selavypath = Path(survey[f'selavy_path_{stokes}'])
+        selavypath = Path(survey[f'selavy_path_{stokes}_{tiletype[0]}'])
         selavy_files = []
 
         for field in fields:
@@ -233,6 +233,7 @@ def measure_flux(
         size: u.Quantity,
         fluxtype: str,
         stokes: str,
+        tiletype: str,
         name: str='source'
 ) -> pd.DataFrame:
     """Measure flux or 3-sigma nondetection limit in multiple epochs at position."""
@@ -252,17 +253,19 @@ def measure_flux(
         for _, field in fields.iterrows():
 
             fieldname = field.field
-            _, header = get_image_from_survey_params(epoch, fieldname, stokes, load=False)
+            _, header = get_image_from_survey_params(epoch, fieldname, stokes, tiletype, load=False)
         
             selavy = SelavyCatalogue.from_params(epoch['name'], fieldname, stokes)
             component = selavy.nearest_component(position, radius=size)
 
             if component is None:
                 # Measure 3-sigma limit from RMS map
-                image_file = list(Path(epoch[f'image_path_{stokes}']).glob(f'*{fieldname}*.fits'))[0]
-                rms_image = Path(str(image_file)
-                                .replace('IMAGES', 'RMSMAPS')
-                                .replace(f'.{stokes.upper()}.fits', f'.{stokes.upper()}_rms.fits'))
+                image_file = list(Path(epoch[f'image_path_{stokes}_{tiletype[0]}']).glob(f'*{fieldname}*.fits'))[0]
+                rms_image = Path(
+                    str(image_file)
+                    .replace('IMAGES', 'RMSMAPS')
+                    .replace(f'.{stokes.upper()}.fits', f'.{stokes.upper()}_rms.fits')
+                )
 
                 flux = measure_limit(position, rms_image, 30*u.arcsec)
                 flux_err = np.nan

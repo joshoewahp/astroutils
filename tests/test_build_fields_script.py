@@ -14,9 +14,9 @@ def test_script_works(mocker):
     os.system('mkdir -p tests/fields/')
 
     runner = CliRunner()
-    _ = runner.invoke(main, 'vastp3x'.split(), input='1')
+    _ = runner.invoke(main, 'vastp3x -t TILES'.split())
 
-    assert os.path.exists('tests/fields/vastp3x_fields.csv')
+    assert os.path.exists('tests/fields/vastp3x_tiles_fields.csv')
 
     os.system('rm -r tests/fields')
 

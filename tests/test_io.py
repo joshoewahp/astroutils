@@ -30,8 +30,8 @@ def test_get_config_has_paths():
 @pytest.mark.parametrize(
     "system, valid_path_roots",
     [
-        ("ada.physics.usyd.edu.au", ["/import/ada1", "/import/ada2"]),
-        ("vast-data", ["/data/pilot", "/home/joshoewahp/"]),
+        ("ada.physics.usyd.edu.au", ["/import/ada1", "/import/ada2", "/import/ruby1/", ""]),
+        ("vast-data", ["/data/pilot", "/home/joshoewahp/", ""]),
     ]
 )
 def test_surveys_on_valid_systems(system, valid_path_roots, mocker):
@@ -39,13 +39,14 @@ def test_surveys_on_valid_systems(system, valid_path_roots, mocker):
     mocker.patch('astroutils.io.os.uname', return_value=['', system])
 
     surveys = get_surveys()
-    surveys = surveys[surveys.local].dropna(subset=['selavy_path_i'])
+    surveys = surveys[surveys.local].dropna(subset=['selavy_path_i_T'])
 
+    assert 'root' not in surveys.columns
     assert 'ada_root' not in surveys.columns
     assert 'nimbus_root' not in surveys.columns
 
     assert all([
-        any(p in c.selavy_path_i for p in valid_path_roots)
+        any(p in c.selavy_path_i_T for p in valid_path_roots)
         for _, c in surveys.iterrows()
     ])
 
@@ -67,8 +68,9 @@ def test_valid_survey_using_survey_codes(survey, mocker):
     # Should be a single survey (Series)
     assert isinstance(survey, pd.Series)
 
-    # Check each survey has 23 parameters
-    assert len(survey) == 23
+    # Check each survey has 32 parameters
+    assert len(survey) == 32
+
 
 surveys = pd.read_json(SURVEYS_PATH).name
 @pytest.mark.parametrize("survey", list(surveys))
@@ -80,8 +82,8 @@ def test_valid_survey_using_names(survey, mocker):
     # Should be a single survey (Series)
     assert isinstance(survey, pd.Series)
 
-    # Check each survey has 23 parameters
-    assert len(survey) == 23
+    # Check each survey has 32 parameters
+    assert len(survey) == 32
 
 
 def test_invalid_survey_name_raises_not_implemented_error(mocker):
@@ -126,10 +128,10 @@ def test_load_is_false():
 def test_image_path_resolves():
 
     epoch = pd.Series({
-        'image_path_i': 'tests/data/',
+        'image_path_i_T': 'tests/data/',
         'field': 'mJy'
     })
-    _, header = get_image_from_survey_params(epoch, field='mJy', stokes='i', load=True)
+    _, header = get_image_from_survey_params(epoch, field='mJy', stokes='i', tiletype='TILES', load=True)
 
     # Check the correct image is loaded by looking at centre coordinates and MJD
     assert header['CRVAL1'] == 189.3062529167
@@ -148,7 +150,7 @@ def test_askap_fields_load(mocker):
 
     position = SkyCoord(ra=4, dec=0, unit='deg')
 
-    fields = find_fields(position, 'vastp1')
+    fields = find_fields(position, 'vastp1', tiletype='TILES')
 
     expected['dist_field_centre'] = 4.
 
@@ -166,7 +168,7 @@ def test_small_primary_beam_size_survey(mocker):
     position = SkyCoord(ra=4, dec=0, unit='deg')
 
     # VLASS has a primary beam of ~1 degree, and so should return empty here
-    fields = find_fields(position, 'vlass')
+    fields = find_fields(position, 'vlass1', tiletype=None)
 
     assert fields.empty
 
@@ -175,7 +177,7 @@ def test_invalid_survey_name_raises_error():
 
     with pytest.raises(FITSException):
         position = SkyCoord(ra=4, dec=0, unit='deg')
-        find_fields(position, 'vastp0')
+        find_fields(position, 'vastp0', tiletype='COMBINED')
 
         
 @pytest.mark.parametrize(
@@ -188,8 +190,8 @@ def test_invalid_survey_name_raises_error():
 def test_multi_field_survey_with_fieldname_no_sbid(surveyname, testdata_dir, num_fields, field_list, sbid_list, mocker):
     survey = pd.Series({
         'survey': surveyname,
-        'image_path_i': f'tests/data/{testdata_dir}/STOKESI_IMAGES/',
-        'image_path_v': f'tests/data/{testdata_dir}/STOKESV_IMAGES/',
+        'image_path_i_T': f'tests/data/{testdata_dir}/STOKESI_IMAGES/',
+        'image_path_v_T': f'tests/data/{testdata_dir}/STOKESV_IMAGES/',
     })
     mocker.patch('astroutils.io.get_survey', return_value=survey)
 
@@ -203,13 +205,13 @@ def test_multi_field_survey_with_fieldname_no_sbid(surveyname, testdata_dir, num
 def test_field_with_no_fieldname_or_sbid_raises_error(mocker):
     survey = pd.Series({
         'survey': 'gw1',
-        'image_path_i': 'tests/data/no_fieldname_or_sbid/STOKESI_IMAGES/',
-        'image_path_v': 'tests/data/no_fieldname_or_sbid/STOKESV_IMAGES/',
+        'image_path_i_T': 'tests/data/no_fieldname_or_sbid/STOKESI_IMAGES/',
+        'image_path_v_T': 'tests/data/no_fieldname_or_sbid/STOKESV_IMAGES/',
     })
     mocker.patch('astroutils.io.get_survey', return_value=survey)
 
     with pytest.raises(FITSException):
-        build_field_csv('gw1')
+        build_field_csv('gw1', tiletype='TILES')
 
 
 image_dot_stokes_path_i = Path('tests/data/multi_field_with_fieldname_no_sbid/STOKESI_IMAGES/')
@@ -235,9 +237,13 @@ def test_image_filename_parsing(i_stokes, v_stokes, stokesi_path, stokesv_path, 
     assert len(i_paths) == num_paths_i
     assert len(v_paths) == num_paths_v
 
-def test_parsing_of_vlass1_subdirectories():
+vlass = pd.Series({
+    'data_path': 'tests/data/vlass/VLASS1.1/',
+    
+})
+def test_parsing_of_vlass_subdirectories(mocker):
 
-    path = Path('tests/data/vlass/VLASS1.1/')
-    fields = build_vlass_field_csv(path)
+    mocker.patch('astroutils.io.get_survey', return_value=vlass)
+    fields = build_vlass_field_csv('vlass1')
 
     assert len(fields) == 1

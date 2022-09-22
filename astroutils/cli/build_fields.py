@@ -12,18 +12,20 @@ logger = logging.getLogger(__name__)
 
 @click.command()
 @click.option('-v', '--verbose', is_flag=True, help="Enable verbose logging mode")
+@click.option('-t', '--tiletype', type=click.Choice(['TILES', 'COMBINED']), default='TILES')
 @click.argument('epoch')
-def main(epoch, verbose):
+def main(epoch, tiletype, verbose):
 
     setupLogger(verbose)
     
-    if str(epoch) == 'vlass':
-        base_dir = Path('/import/ada2/vlass/')
-        fields = build_vlass_field_csv(base_dir)
+    if 'vlass' in str(epoch):
+        tilestr = ''
+        fields = build_vlass_field_csv(epoch)
     else:
-        fields = build_field_csv(epoch)
+        tilestr = f'_{tiletype.lower()}'
+        fields = build_field_csv(epoch, tiletype)
 
-    fields.to_csv(f'{aux_path}/fields/{epoch}_fields.csv', index=False)
+    fields.to_csv(f'{aux_path}/fields/{epoch}{tilestr}_fields.csv', index=False)
 
     logger.info(f"Created field metadata csv for {epoch}:\n{fields}")
     
