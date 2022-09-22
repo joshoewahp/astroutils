@@ -46,9 +46,16 @@ class SelavyCatalogue:
         pattern = re.compile(r'\S*(\d{4}[+-]\d{2})\S*')
         sbidpattern = re.compile(r'\S*SB(\d{4,5})\S*')
 
+        field = pattern.sub(r'\1', str(selavypath))
+        sbid = sbidpattern.sub(r'\1', str(selavypath))
+
+        # Replace fields without a name by SBID (e.g. GW fields)
+        if field == str(selavypath):
+            field = 'SB' + sbid
+
         components['sign'] = -1 if (selavypath.name[0] == 'n' or 'nimage' in selavypath.name) else 1
-        components['field'] = pattern.sub(r'\1', str(selavypath))
-        components['sbid'] = sbidpattern.sub(r'\1', str(selavypath))
+        components['field'] = field
+        components['sbid'] = sbid
 
         return components
 
@@ -172,7 +179,7 @@ def condon_flux_error(
     # clean_bias = 0
     clean_bias_error = 0
 
-    # Condon (1997) Equation 40
+    # Condon (1997) Equation 41
     rho_sq = ((theta_M * theta_m / (4 * bmaj * bmin)) *
               ((1 + (bmaj/theta_M)**2)) ** alpha_M *
               ((1 + (bmin/theta_m)**2)) ** alpha_m *
