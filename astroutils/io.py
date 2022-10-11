@@ -181,13 +181,17 @@ def build_field_csv(epoch: str, tiletype: str='TILES') -> pd.DataFrame:
 
         # Locate coordinates of image pixel centre
         w = WCS(header, naxis=2)
-        date_obs = header["DATE-OBS"]
+        date_obs = header.get("DATE-OBS", "")
         size_x = header["NAXIS1"]
         size_y = header["NAXIS2"]
         central_coords = [[size_x / 2., size_y / 2.]]
         centre = w.wcs_pix2world(np.array(central_coords, np.float_), 1)
 
-        v_path = [p for p in v_paths if field in str(p)][0]
+        if len(v_paths) == 0:
+            v_path = ''
+        else:
+            v_path = [p for p in v_paths if field in str(p)][0]
+
         params = {
             'field': field,
             'sbid': sbid,
