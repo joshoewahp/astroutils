@@ -318,3 +318,56 @@ def measure_limit(position: SkyCoord, image_path: Path, size: u.Quantity) -> pd.
     else:
         return 3 * np.sqrt(np.mean(np.square(cutout.data)))
 
+
+def measure_polarised_source(
+        position: SkyCoord,
+        survey: str,
+        field: str,
+        tiletype: str='TILES',
+) -> pd.Series:
+
+    # Get selavy fluxes
+    cat_i = SelavyCatalogue.from_params(
+        survey,
+        stokes='i',
+        tiletype=tiletype,
+        fields=[field],
+    )
+    cat_v = SelavyCatalogue.from_params(
+        survey,
+        stokes='v',
+        tiletype=tiletype,
+        fields=[field],
+    )
+    comp_i = cat_i.cone_search(position, radius=0.1*u.arcmin).iloc[0]
+    comp_v = cat_v.cone_search(position, radius=0.1*u.arcmin).iloc[0]
+    
+    # Get PSF size parameters
+    epoch = get_survey(survey)
+    _, header = get_image_from_survey_params(epoch, field, 'i', tiletype, load=False)
+    bmaj, bmin = header['bmaj']*u.deg, header['bmin']*u.deg
+
+    # Calculate errors
+    i_peak_err = condon_flux_error(comp_i, bmaj, bmin, fluxtype='peak')
+    i_int_err = condon_flux_error(comp_i, bmaj, bmin, fluxtype='int')
+    v_peak_err = condon_flux_error(comp_v, bmaj, bmin, fluxtype='peak')
+    v_int_err = condon_flux_error(comp_v, bmaj, bmin, fluxtype='int')
+
+    # Calculate fractional polarisation and error
+    source = pd.Series({
+        'flux_peak_i': comp_i.flux_peak,
+        'flux_peak_err_i': i_peak_err,
+        'flux_int_i': comp_i.flux_int,
+        'flux_int_err_i': i_int_err,
+        'flux_peak_v': comp_v.flux_peak,
+        'flux_peak_err_v': v_peak_err,
+        'flux_int_v': comp_v.flux_int,
+        'flux_int_err_v': v_int_err,
+    })
+    source['fp_peak'] = source.flux_peak_v / source.flux_peak_i
+    source['fp_peak_err'] = fractional_pol_error(source, flux_col='flux_peak', fp_col='fp_peak')
+    source['fp_int'] = source.flux_int_v / source.flux_int_i
+    source['fp_int_err'] = fractional_pol_error(source, flux_col='flux_int', fp_col='fp_int')
+    
+    return source
+
