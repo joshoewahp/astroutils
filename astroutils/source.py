@@ -14,10 +14,12 @@ from astroutils.io import find_fields, get_image_data_header, get_survey, get_im
 
 logger = logging.getLogger(__name__)
 
+Pathset = Union[str, Path, list[str], list[Path]]
+Strset = Union[str, list[str]]
 
 class SelavyCatalogue:
 
-    def __init__(self, selavypath: Union[str, Path, list[str], list[Path]], correct_negative=True):
+    def __init__(self, selavypath: Pathset, correct_negative: bool=True):
 
         if isinstance(selavypath, str):
             selavypath = [Path(selavypath)]
@@ -54,13 +56,13 @@ class SelavyCatalogue:
             field = 'SB' + sbid
 
         components['sign'] = -1 if (selavypath.name[0] == 'n' or 'nimage' in selavypath.name) else 1
-        components['field'] = field
+
         components['sbid'] = sbid
 
         return components
 
     @classmethod
-    def from_params(cls, epoch: str, stokes: str, tiletype: str, fields: Union[str, list[str]]='', is_name: bool=False):
+    def from_params(cls, epoch: str, stokes: str, tiletype: str, fields: Strset='', is_name: bool=False):
 
         if isinstance(fields, str):
             fields = [fields]
@@ -85,7 +87,7 @@ class SelavyCatalogue:
         return cls(selavy_files)
 
     @classmethod
-    def from_aegean(cls, aegeanpath: Union[str, Path]):
+    def from_aegean(cls, aegeanpath: Pathset):
         """Load Aegean source cat and convert to selavy format."""
 
         cat = cls(aegeanpath, correct_negative=False)

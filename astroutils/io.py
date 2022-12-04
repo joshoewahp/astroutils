@@ -18,6 +18,8 @@ warnings.filterwarnings('ignore', category=FITSFixedWarning, append=True)
 PACKAGE_ROOT = Path(__file__).parent
 SURVEYS_PATH = PACKAGE_ROOT / "surveys.json"
 
+Strset = Union[str, None]
+
 logger = logging.getLogger(__name__)
 
 
@@ -76,7 +78,7 @@ def get_surveys() -> pd.DataFrame:
     return surveys
 
 
-def get_survey(epoch: str, is_name=False) -> pd.Series:
+def get_survey(epoch: str, is_name: bool=False) -> pd.Series:
     """Get a single survey epoch from surveys.json."""
 
     surveys = get_surveys()
@@ -114,7 +116,7 @@ def get_image_from_survey_params(epoch: pd.Series, field: str, stokes: str, tile
     return data, header
 
 
-def find_fields(position: SkyCoord, epoch: str, tiletype: Union[str, None]) -> pd.DataFrame:
+def find_fields(position: SkyCoord, epoch: str, tiletype: Strset) -> pd.DataFrame:
     """Return DataFrame of epoch fields containing position."""
 
     tilestr = f'_{tiletype.lower()}' if tiletype else ''
