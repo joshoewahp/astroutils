@@ -2,6 +2,7 @@ import pytest
 import sys
 import numpy as np
 import pandas as pd
+import astropy.units as u
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from pathlib import Path
@@ -168,7 +169,7 @@ def test_small_primary_beam_size_survey(mocker):
     position = SkyCoord(ra=4, dec=0, unit='deg')
 
     # VLASS has a primary beam of ~1 degree, and so should return empty here
-    fields = find_fields(position, 'vlass1', tiletype=None)
+    fields = find_fields(position, 'vlass1', tiletype=None, radius=1*u.deg)
 
     assert fields.empty
 

@@ -7,7 +7,7 @@ import warnings
 import astropy.units as u
 import numpy as np
 import pandas as pd
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import SkyCoord, Angle
 from astropy.io import fits
 from astropy.wcs import WCS, FITSFixedWarning
 from pathlib import Path
@@ -116,7 +116,7 @@ def get_image_from_survey_params(epoch: pd.Series, field: str, stokes: str, tile
     return data, header
 
 
-def find_fields(position: SkyCoord, epoch: str, tiletype: Strset) -> pd.DataFrame:
+def find_fields(position: SkyCoord, epoch: str, tiletype: Strset, radius: Angle=5*u.deg) -> pd.DataFrame:
     """Return DataFrame of epoch fields containing position."""
 
     tilestr = f'_{tiletype.lower()}' if tiletype else ''
@@ -129,8 +129,7 @@ def find_fields(position: SkyCoord, epoch: str, tiletype: Strset) -> pd.DataFram
     beam_centre = SkyCoord(ra=image_df['cr_ra_pix'], dec=image_df['cr_dec_pix'], unit=u.deg)
     image_df['dist_field_centre'] = beam_centre.separation(position).deg
     
-    pbeamsize = 1 * u.deg if 'vlass' in epoch else 5 * u.deg
-    fields = image_df[image_df.dist_field_centre < pbeamsize].reset_index(drop=True)
+    fields = image_df[image_df.dist_field_centre < radius].reset_index(drop=True)
 
     return fields
 
