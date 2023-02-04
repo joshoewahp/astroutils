@@ -57,6 +57,7 @@ class SelavyCatalogue:
 
         components['sign'] = -1 if (selavypath.name[0] == 'n' or 'nimage' in selavypath.name) else 1
 
+        components['field'] = field
         components['sbid'] = sbid
 
         return components
