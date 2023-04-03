@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 Pathset = Union[str, Path, list[str], list[Path]]
 Strset = Union[str, list[str]]
 
+
 class SelavyCatalogue:
 
     def __init__(self, selavypath: Pathset, correct_negative: bool=True):
@@ -29,13 +30,22 @@ class SelavyCatalogue:
             selavypath = [Path(p) for p in selavypath]
 
         self.selavypath = cast(list[Path], selavypath)
-        self.components = pd.concat([self._load(p) for p in self.selavypath])
+        
+        components = [self._load(p) for p in self.selavypath]
+        components = [c for c in components if c is not None]
+
+        if len(components) == 0:
+            raise ValueError("No components found.")
+
+        self.components = pd.concat(components)
+
         if correct_negative:
             self._correct_negative_fluxes()
 
     def _load(self, selavypath: Path) -> pd.DataFrame:
         """Import selavy catalogue from multiple source formats to pandas DataFrame."""
 
+        # Read in variety of data formats
         if selavypath.suffix in ['.xml', '.vot']:
             components = Table.read(
                 selavypath, format="votable", use_names_over_ids=True
@@ -43,7 +53,15 @@ class SelavyCatalogue:
         elif selavypath.suffix == '.parq':
             components = pd.read_parquet(selavypath)
         else:
-            components = pd.read_fwf(selavypath, skiprows=[1]).drop(columns=['#'])
+            components = pd.read_fwf(selavypath, skiprows=[1])
+
+        # Skip loading of empty component files
+        if components.empty:
+            return 
+            
+        # Fix extra column in FWF files
+        if '#' in components.columns:
+            components.drop(columns=['#'], inplace=True)
 
         pattern = re.compile(r'\S*(\d{4}[+-]\d{2})\S*')
         sbidpattern = re.compile(r'\S*SB(\d{4,5})\S*')
