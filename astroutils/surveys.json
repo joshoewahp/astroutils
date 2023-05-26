@@ -897,9 +897,9 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "racs-mid-new",
-    "name": "RACS Mid New",
-    "ada_root": "/import/ada1/jpri6587/data/RACS-mid-final/",
+    "survey": "racs-mid",
+    "name": "RACS Mid",
+    "ada_root": "/import/ada1/jpri6587/data/RACS-mid/",
     "nimbus_root": "",
     "tiles_I": true,
     "tiles_V": true,
@@ -1357,8 +1357,8 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "vastp22",
-    "name": "VAST P-22",
+    "survey": "vast22",
+    "name": "VAST 22",
     "ada_root": "",
     "nimbus_root": "/home/joshoewahp/data/VAST/EPOCH22/",
     "tiles_I": true,
@@ -1380,8 +1380,8 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "vastp23",
-    "name": "VAST P-23",
+    "survey": "vast23",
+    "name": "VAST 23",
     "ada_root": "",
     "nimbus_root": "/home/joshoewahp/data/VAST/EPOCH23/",
     "tiles_I": true,
@@ -1403,8 +1403,8 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "vastp24",
-    "name": "VAST P-24",
+    "survey": "vast24",
+    "name": "VAST 24",
     "ada_root": "",
     "nimbus_root": "/home/joshoewahp/data/VAST/EPOCH24/",
     "tiles_I": true,
@@ -1426,8 +1426,8 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "vastp25",
-    "name": "VAST P-25",
+    "survey": "vast25",
+    "name": "VAST 25",
     "ada_root": "",
     "nimbus_root": "/home/joshoewahp/data/VAST/EPOCH25/",
     "tiles_I": true,
@@ -1449,8 +1449,8 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "vastp26",
-    "name": "VAST P-26",
+    "survey": "vast26",
+    "name": "VAST 26",
     "ada_root": "",
     "nimbus_root": "/home/joshoewahp/data/VAST/EPOCH26/",
     "tiles_I": true,
@@ -1472,8 +1472,8 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "vastp27",
-    "name": "VAST P-27",
+    "survey": "vast27",
+    "name": "VAST 27",
     "ada_root": "",
     "nimbus_root": "/home/joshoewahp/data/VAST/EPOCH27/",
     "tiles_I": true,
@@ -1495,8 +1495,8 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "vastp30",
-    "name": "VAST P-30",
+    "survey": "vast30",
+    "name": "VAST 30",
     "ada_root": "",
     "nimbus_root": "/home/joshoewahp/data/VAST/EPOCH30/",
     "tiles_I": true,
@@ -1518,8 +1518,8 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "vastp31",
-    "name": "VAST P-31",
+    "survey": "vast31",
+    "name": "VAST 31",
     "ada_root": "",
     "nimbus_root": "/home/joshoewahp/data/VAST/EPOCH31/",
     "tiles_I": true,
@@ -1541,8 +1541,8 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "vastp32",
-    "name": "VAST P-32",
+    "survey": "vast32",
+    "name": "VAST 32",
     "ada_root": "",
     "nimbus_root": "/home/joshoewahp/data/VAST/EPOCH32/",
     "tiles_I": true,
@@ -1564,8 +1564,8 @@
     "cutout_size": 0.025
   },
   {
-    "survey": "vastp33",
-    "name": "VAST P-33",
+    "survey": "vast33",
+    "name": "VAST 33",
     "ada_root": "",
     "nimbus_root": "/home/joshoewahp/data/VAST/EPOCH33/",
     "tiles_I": true,
