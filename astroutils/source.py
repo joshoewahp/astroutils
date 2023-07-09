@@ -37,7 +37,7 @@ class SelavyCatalogue:
         if len(components) == 0:
             raise ValueError("No components found.")
 
-        self.components = pd.concat(components)
+        self.components = pd.concat(components).reset_index(drop=True)
 
         if correct_negative:
             self._correct_negative_fluxes()
@@ -392,3 +392,106 @@ def measure_polarised_source(
     
     return source
 
+def get_stokes_matches(
+        survey: str,
+        tiletype: str='TILES',
+) -> pd.DataFrame:
+    """Crossmatch all Stokes I and V selavy components in survey epoch.
+
+    These are useful for characterising leakage, so we search for all matches within 20 arcsec
+    in order to easily identify isolated sources that sample polarisation leakage across the field.
+    """
+    
+    fields = pd.read_csv(f'/import/ada1/jpri6587/aux_data/fields/{survey}_{tiletype.lower()}_fields.csv')
+
+    components = []
+    for _, field in fields.iterrows():
+
+        try:
+            sel_i = SelavyCatalogue.from_params(
+                epoch=survey,
+                stokes='i',
+                tiletype=tiletype,
+                fields=field.field,
+            ).components
+            sel_v = SelavyCatalogue.from_params(
+                epoch=survey,
+                stokes='v',
+                tiletype=tiletype,
+                fields=field.field,
+            ).components
+        except ValueError:
+            logger.warning(f"Selavy file empty for {survey} {field.field}")
+            continue
+        except FileNotFoundError:
+            logger.warning(f"No selavy files found for {survey} {field.field}")
+            continue
+
+        if len(sel_i) < 1000:
+            logger.info(f"Small selavy file at {survey} {field.field}")
+
+        cV = SkyCoord(ra=sel_v.ra_deg_cont, dec=sel_v.dec_deg_cont, unit='deg')
+        cI = SkyCoord(ra=sel_i.ra_deg_cont, dec=sel_i.dec_deg_cont, unit='deg')
+
+        idxI, idxV, d2d, _ = cV.search_around_sky(cI, 20*u.arcsec)
+
+        df = pd.DataFrame({
+            'idx_I': idxI,
+            'idx_V': idxV,
+            'iv_dist': d2d.arcsec
+        })
+
+        cols = [
+            'ra_deg_cont',
+            'dec_deg_cont',
+            'maj_axis',
+            'min_axis',
+            'component_id',
+            'has_siblings',
+            'flux_peak',
+            'flux_int',
+            'rms_image',
+            'maj_axis',
+            'min_axis',
+            'field',
+            'sbid',
+            'sign',
+        ]
+        selv = sel_v[cols]
+        seli = sel_i[cols]
+
+        df = df.merge(
+            seli.rename(columns={col: 'I_'+col for col in cols}),
+            left_on='idx_I',
+            right_index=True
+        )
+
+        df = df.merge(
+            selv.rename(columns={col: 'V_'+col for col in cols}),
+            left_on='idx_V',
+            right_index=True
+        )
+
+        df['epoch'] = survey
+        df = df.merge(
+            fields,
+            left_on='I_field',
+            right_on='field',
+        )
+        df['cp'] = df.V_flux_peak / df.I_flux_peak
+        df['nmatches'] = df.groupby('idx_V').transform('size')
+
+        field_coord = SkyCoord(ra=df.cr_ra_pix, dec=df.cr_dec_pix, unit='deg')
+        c = SkyCoord(ra=df.I_ra_deg_cont, dec=df.I_dec_deg_cont, unit='deg')
+        ra_offset, dec_offset = field_coord.spherical_offsets_to(c)
+
+        df['ra_offset'] = ra_offset.deg
+        df['dec_offset'] = dec_offset.deg
+
+        logger.debug(f"{survey} - {field.field}")
+        logger.debug(f"{len(cI)} I components, {len(cV)} V components")
+        logger.debug(f"{len(df)} matches")
+
+        components.append(df)
+
+    return pd.concat(components)
