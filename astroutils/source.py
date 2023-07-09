@@ -81,22 +81,28 @@ class SelavyCatalogue:
         return components
 
     @classmethod
-    def from_params(cls, epoch: str, stokes: str, tiletype: str, fields: Strset='', is_name: bool=False):
+    def from_params(cls, epoch: str, stokes: str, tiletype: str, fields: Strset='', sbids: Strset='', is_name: bool=False):
 
         if isinstance(fields, str):
             fields = [fields]
+
+        if sbids == '':
+            sbids = ['' for field in fields]
+        elif isinstance(sbids, str):
+            sbids = [sbids]
+            
         
         survey = get_survey(epoch, is_name)
 
         selavypath = Path(survey[f'selavy_path_{stokes}_{tiletype[0]}'])
         selavy_files = []
 
-        for field in fields:
+        for field, sbid in zip(fields, sbids):
 
             # First try locating catalogues in xml format, then try txt format
-            files = list(selavypath.glob(f'*[._]{field}*components.xml'))
+            files = list(selavypath.glob(f'*[._]{field}[AB.]*{sbid}.*components.xml'))
             if len(files) == 0:
-                files = list(selavypath.glob(f'*[._]{field}*components.txt'))
+                files = list(selavypath.glob(f'*[._]{field}[AB.]*{sbid}.*components.txt'))
 
             selavy_files.extend(files)
             
