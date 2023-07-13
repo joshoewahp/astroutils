@@ -48,8 +48,12 @@ class SelavyCatalogue:
         # Read in variety of data formats
         if selavypath.suffix in ['.xml', '.vot']:
             components = Table.read(
-                selavypath, format="votable", use_names_over_ids=True
+                selavypath,
+                format="votable",
+                use_names_over_ids=True,
             ).to_pandas()
+        elif selavypath.suffix == '.csv':
+            components = pd.read_csv(selavypath)
         elif selavypath.suffix == '.parq':
             components = pd.read_parquet(selavypath)
         else:
@@ -90,7 +94,6 @@ class SelavyCatalogue:
             sbids = ['' for field in fields]
         elif isinstance(sbids, str):
             sbids = [sbids]
-            
         
         survey = get_survey(epoch, is_name)
 
