@@ -13,6 +13,8 @@ matplotlib = "^3.5.1"
 colorlog = "^6.6.0"
 pyarrow = "^7.0.0"
 click = "^8.0.4"
+forced-phot = {git = "https://github.com/askap-vast/forced_phot.git"}
+dask = {extras = ["distributed"], version = "^2023.5.1"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -23,6 +25,8 @@ pytest-cov = "^3.0.0"
 
 [tool.poetry.scripts]
 astroutils-build-fields = "astroutils.cli.build_fields:main"
+astroutils-fit-flux = "astroutils.cli.fit_flux:main"
+astroutils-lightcurve = "astroutils.cli.lightcurve:main"
 
 [tool.pytest.ini_options]
 filterwarnings = [
