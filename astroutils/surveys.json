@@ -2200,6 +2200,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2220,6 +2221,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2240,6 +2242,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2261,6 +2264,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2282,6 +2286,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2303,6 +2308,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2324,6 +2330,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2341,6 +2348,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2359,6 +2367,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2377,6 +2386,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2395,6 +2405,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2413,6 +2424,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2432,6 +2444,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
@@ -2450,6 +2463,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": false,
     "cutout_size": 0.25
   },
   {
@@ -2469,6 +2483,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": false,
     "cutout_size": 0.15
   },
   {
@@ -2487,12 +2502,13 @@
     "local": false,
     "radio": false,
     "cutout": true,
+    "contours": true,
     "cutout_size": 0.02
   },
   {
     "survey": "swift",
-    "name": "SWIFT Counts",
-    "skyview": "SwiftXRTCnt",
+    "name": "Swift Counts",
+    "skyview": "BAT SNR 14-195",
     "tiles_I": false,
     "tiles_V": false,
     "combined_I": false,
@@ -2505,6 +2521,7 @@
     "local": false,
     "radio": false,
     "cutout": true,
-    "cutout_size": 0.02
+    "contours": true,
+    "cutout_size": 0.1
   }
 ]

@@ -120,11 +120,11 @@ def find_fields(position: SkyCoord, epoch: str, tiletype: Strset, radius: Angle=
     """Return DataFrame of epoch fields containing position."""
 
     tilestr = f'_{tiletype.lower()}' if tiletype else ''
+    path = f'{aux_path}/fields/{epoch}{tilestr}_fields.csv'
     try:
-        image_df = pd.read_csv(f'{aux_path}/fields/{epoch}{tilestr}_fields.csv')
+        image_df = pd.read_csv(path)
     except FileNotFoundError:
-        print(f'{aux_path}/fields/{epoch}{tilestr}_fields.csv')
-        raise FITSException(f"Missing field metadata csv for {epoch}.")
+        raise FITSException(f"Missing field metadata csv for {epoch} at {path}.")
     
     beam_centre = SkyCoord(ra=image_df['cr_ra_pix'], dec=image_df['cr_dec_pix'], unit=u.deg)
     image_df['dist_field_centre'] = beam_centre.separation(position).deg
