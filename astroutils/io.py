@@ -139,7 +139,8 @@ def parse_image_filenames_in_dir(path: Path, stokes: str) -> list[Path]:
 
     patterns = (
         f'image.{stokes.lower()}*fits',
-        f'*{stokes.upper()}.fits'
+        f'*{stokes.upper()}.fits',
+        f'*{stokes.upper()}.conv.fits',
     )
 
     image_paths = [p for p in path.iterdir() if any(p.match(pattern) for pattern in patterns)]
