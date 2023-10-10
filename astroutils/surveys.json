@@ -1291,7 +1291,7 @@
     "survey": "vastp20",
     "name": "VAST P-20",
     "ada_root": "/import/ada1/jpri6587/data/VASTP-mid/EPOCH20/",
-    "nimbus_root": "/home/joshoewahp/data/VASTP-mid/EPOCH19/",
+    "nimbus_root": "/home/joshoewahp/data/VASTP-mid/EPOCH20/",
     "tiles_I": true,
     "tiles_V": true,
     "combined_I": false,
