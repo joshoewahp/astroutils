@@ -56,7 +56,8 @@ def get_surveys() -> pd.DataFrame:
     elif system == 'vast-data':
         surveys['data_path'] = surveys.nimbus_root
     else:
-        raise NotImplementedError(f"Data paths unknown for hostname {system}")
+        surveys['data_path'] = surveys.ada_root
+        logger.error(f"Data paths unknown for hostname {system}. Defaulting to ada paths.")
 
     # Populate all relevant data paths
     def update(row):
