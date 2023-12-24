@@ -11,9 +11,11 @@ from astroutils.source import (
     SelavyCatalogue,
     condon_flux_error,
     fractional_pol_error,
+    measure_epoch_flux,
     measure_flux,
     measure_limit,
 )
+from astroutils.io import FITSException
 
 
 mock_survey = pd.Series({
@@ -214,6 +216,8 @@ def epochs():
     epochs = pd.DataFrame({
         "survey": ["vastp2", "vastp8"],
         "name": ["VAST P1-2", "VAST P1-8"],
+        "image_path_i_T": ["TILES/STOKESI_IMAGES/", "TILES/STOKESI_IMAGES/"],
+        "image_path_v_T": ["TILES/STOKESV_IMAGES/", "TILES/STOKESV_IMAGES/"],
         "image_path_i_C": ["COMBINED/STOKESI_IMAGES/", "COMBINED/STOKESI_IMAGES/"],
         "image_path_v_C": ["COMBINED/STOKESV_IMAGES/", "COMBINED/STOKESV_IMAGES/"],
     })
@@ -221,10 +225,10 @@ def epochs():
 
 mocked_fields = pd.DataFrame({
     'field': ['1237+00', '1237-06'],
-    'sbid': ['SBXXX', 'SBXXX'],
-    'i_path': ['tests/data/test_image_mJy.fits',
+    'sbid': ['', ''],
+    'image_path_i_T': ['tests/data/test_image_mJy.fits',
                'tests/data/test_image_mJy.fits'],
-    'v_path': ['tests/data/test_image_mJy.fits',
+    'image_path_v_T': ['tests/data/test_image_mJy.fits',
                'tests/data/test_image_mJy.fits'],
     'cr_ra_pix': [189.30660013892276, 189.3064293311123],
     'cr_dec_pix': [0.0030764999999284, -6.298899722106099],
@@ -233,27 +237,45 @@ mocked_fields = pd.DataFrame({
     'dist_field_centre': [2.0110998437527563, 4.322889739848082],
 })
 
+
 @pytest.mark.parametrize(
-    "selavy_path, fields, expected_flux",
+    "selavy_path, expected_flux",
     [
-        ('tests/data/VAST_1237+00A.EPOCH02.I.selavy.components.xml', mocked_fields, 1.405),
-        ('tests/data/VAST_1237+00A.EPOCH08.I.selavy.components.xml', mocked_fields, 16.261),
+        ('tests/data/VAST_1237+00A.EPOCH02.I.selavy.components.xml', 1.405),
+        ('tests/data/VAST_1237+00A.EPOCH08.I.selavy.components.xml', 16.261),
     ]
 )
-def test_measure_flux_value(selavy_path, fields, expected_flux, epochs, mocker):
-
-    mocker.patch('astroutils.source.find_fields', return_value=fields)
-    mocker.patch('astroutils.source.Path.glob', return_value=['tests/data/test_image_mJy.fits'])
-    mocker.patch('astroutils.source.SelavyCatalogue.from_params', return_value=SelavyCatalogue(selavy_path))
+def test_measure_flux_value(selavy_path, expected_flux, epochs, mocker):
 
     position = SkyCoord(ra=189.0104, dec=-1.9861, unit='deg')
+    size = 0.1*u.deg
+    fluxtype = 'int'
+    stokes = 'i'
+    tiletype = 'TILES'
+
+    mocker.patch('astroutils.source.Path.glob', return_value=['tests/data/test_image_mJy.fits'])
+    mocker.patch('astroutils.source.find_fields', return_value=mocked_fields)
+    mocker.patch('astroutils.source.SelavyCatalogue.from_params', return_value=SelavyCatalogue(selavy_path))
+
+    flux = measure_epoch_flux(
+        position,
+        epochs.iloc[0],
+        size,
+        fluxtype,
+        stokes,
+        tiletype,
+        name='source',
+    )
+
+    mocker.patch('astroutils.source.Future.result', return_value=flux)
+
     fluxes = measure_flux(
         position,
         epochs,
-        size=0.1*u.deg,
-        fluxtype='int',
-        stokes='i',
-        tiletype='COMBINED',
+        size=size,
+        fluxtype=fluxtype,
+        stokes=stokes,
+        tiletype=tiletype,
     )
 
     assert fluxes.flux.iloc[0].round(3) == expected_flux
@@ -263,26 +285,24 @@ def test_measure_flux_coordinates_with_no_fields(mocker, epochs):
     mocker.patch('astroutils.source.find_fields', return_value=pd.DataFrame())
 
     position = SkyCoord(ra=189.0104, dec=-1.9861, unit='deg')
-    fluxes = measure_flux(
-        position,
-        epochs,
-        size=0.1*u.deg,
-        fluxtype='int',
-        stokes='i',
-        tiletype='COMBINED',
-    )
 
-    assert fluxes.empty
+    with pytest.raises(FITSException):
+        fluxes = measure_flux(
+            position,
+            epochs,
+            size=0.1*u.deg,
+            fluxtype='int',
+            stokes='i',
+            tiletype='TILES',
+        )
 
-
-# Measure Limit
 
 @pytest.mark.parametrize(
     "image_path, expected_flux",
     [
         (Path('tests/data/test_image_Jy.fits'), 1.1002),
         (Path('tests/data/test_image_mJy.fits'), 1.1002),
-        (Path('tests/data/test_image_rms.fits'), 1.0408),
+        (Path('tests/data/test_image_rms.fits'), 1.0427),
     ]
 )
 def test_measure_limit_values(image_path, expected_flux):

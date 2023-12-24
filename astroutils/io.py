@@ -193,7 +193,10 @@ def build_field_csv(epoch: str, tiletype: str='TILES') -> pd.DataFrame:
         if len(v_paths) == 0:
             v_path = ''
         else:
-            v_path = [p for p in v_paths if field in str(p) and sbid in str(p)][0]
+            if sbid == 'SBXXX':
+                v_path = [p for p in v_paths if field in str(p)][0]
+            else:
+                v_path = [p for p in v_paths if field in str(p) and sbid in str(p)][0]
 
         params = {
             'field': field,

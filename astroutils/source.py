@@ -11,7 +11,7 @@ from astropy.wcs import WCS
 from pathlib import Path
 from typing import Union, cast
 from forced_phot import ForcedPhot
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from concurrent.futures import Future, ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 
 from astroutils.io import find_fields, get_image_data_header, get_survey, get_image_from_survey_params
 

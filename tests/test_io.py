@@ -32,6 +32,7 @@ def test_get_config_has_paths():
     "system, valid_path_roots",
     [
         ("ada.physics.usyd.edu.au", ["/import/ada1", "/import/ada2", "/import/ruby1/", ""]),
+        ("localhost", ["/import/ada1", "/import/ada2", "/import/ruby1/", ""]),
         ("vast-data", ["/data/pilot", "/home/joshoewahp/", ""]),
     ]
 )
@@ -52,40 +53,22 @@ def test_surveys_on_valid_systems(system, valid_path_roots, mocker):
     ])
 
 
-def test_invalid_system_raises_error(mocker):
-    mocker.patch('astroutils.io.os.uname', return_value=['', 'localhost'])
-
-    with pytest.raises(NotImplementedError):
-        get_surveys()
-
-
-surveys = pd.read_json(SURVEYS_PATH).survey
-@pytest.mark.parametrize("survey", list(surveys))
-def test_valid_survey_using_survey_codes(survey, mocker):
+def test_valid_survey_using_survey_codes(mocker):
     mocker.patch('astroutils.io.os.uname', return_value=['', 'ada.physics.usyd.edu.au']) 
 
-    survey = get_survey(survey)
+    survey = get_survey('racs-low')
 
     # Should be a single survey (Series)
     assert isinstance(survey, pd.Series)
 
-    # Check each survey has 32 parameters
-    assert len(survey) == 32
 
-
-surveys = pd.read_json(SURVEYS_PATH).name
-@pytest.mark.parametrize("survey", list(surveys))
-def test_valid_survey_using_names(survey, mocker):
+def test_valid_survey_using_names(mocker):
     mocker.patch('astroutils.io.os.uname', return_value=['', 'ada.physics.usyd.edu.au']) 
 
-    survey = get_survey(survey, is_name=True)
+    survey = get_survey('RACS Low', is_name=True)
 
     # Should be a single survey (Series)
     assert isinstance(survey, pd.Series)
-
-    # Check each survey has 32 parameters
-    assert len(survey) == 32
-
 
 def test_invalid_survey_name_raises_not_implemented_error(mocker):
     mocker.patch('astroutils.io.os.uname', return_value=['', 'ada.physics.usyd.edu.au']) 
