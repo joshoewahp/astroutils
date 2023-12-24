@@ -116,7 +116,14 @@ def get_survey(epoch: str, is_name: bool = False) -> pd.Series:
     return survey
 
 
+<<<<<<< HEAD
 def get_image_data_header(image_path: Path, load_data: bool = True):
+=======
+def get_image_data_header(
+    image_path: Path,
+    load_data: bool = True,
+) -> tuple[np.array, PrimaryHDU]:
+>>>>>>> 8434e1a (updated dependencies)
     """Open FITS image and fetch header / data in units of mJy/beam."""
 
     with fits.open(image_path) as hdul:
@@ -132,8 +139,17 @@ def get_image_data_header(image_path: Path, load_data: bool = True):
 
 
 def get_image_from_survey_params(
+<<<<<<< HEAD
     epoch: pd.Series, field: str, stokes: str, tiletype: str, load: bool = True
 ):
+=======
+    epoch: pd.Series,
+    field: str,
+    stokes: str,
+    tiletype: str,
+    load: bool = True,
+) -> tuple[np.array, PrimaryHDU]:
+>>>>>>> 8434e1a (updated dependencies)
     """Get image header and data for a given field, epoch, and Stokes parameter."""
 
     image_path = list(

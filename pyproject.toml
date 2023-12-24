@@ -5,9 +5,14 @@ description = ""
 authors = ["Joshua <jpri6587@sydney.edu.au>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
+<<<<<<< HEAD
 astropy = "^5.0.1"
 pandas = "^1.4.1"
+=======
+astropy = "^6.0.0"
+pandas = "^2.1.4"
+>>>>>>> 8434e1a (updated dependencies)
 numpy = "^1.22.2"
 matplotlib = "^3.5.1"
 colorlog = "^6.6.0"

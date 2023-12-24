@@ -1,11 +1,6 @@
 import logging
 import re
-from concurrent.futures import (
-    Future,
-    ProcessPoolExecutor,
-    ThreadPoolExecutor,
-    as_completed,
-)
+from concurrent.futures import Future, ProcessPoolExecutor
 from pathlib import Path
 from typing import Union, cast
 
@@ -19,12 +14,8 @@ from astropy.table import Table
 from astropy.wcs import WCS
 from forced_phot import ForcedPhot
 
-from astroutils.io import (
-    find_fields,
-    get_image_data_header,
-    get_image_from_survey_params,
-    get_survey,
-)
+from astroutils.io import (find_fields, get_image_data_header,
+                           get_image_from_survey_params, get_survey)
 
 logger = logging.getLogger(__name__)
 
@@ -292,7 +283,11 @@ def fractional_pol_error(
     """
 
     if corr_errors:
-        corr_xy = sources.corr().loc[f"{flux_col}_i", f"{flux_col}_v"]
+        corr_xy = (
+            sources[[f"{flux_col}_i", f"{flux_col}_v"]]
+            .corr()
+            .loc[f"{flux_col}_i", f"{flux_col}_v"]
+        )
         logger.info(f"Using corr(I, V) = {corr_xy:.4f} for f_p error propagation.")
     else:
         corr_xy = 0
