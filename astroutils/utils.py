@@ -1,17 +1,19 @@
-import astropy.units as u
-import numpy as np
-from astropy.units import Quantity
 from numbers import Number
 from typing import Union, cast
 
+import astropy.units as u
+import numpy as np
+from astropy.units import Quantity
+
 Numeric = Union[Number, Quantity]
+
 
 def round_sigfigs(val: Numeric, sigfigs: int) -> Numeric:
     """Round a float to specified number of significant figures."""
 
     if sigfigs < 1:
         raise ValueError("Cannot round to less than one significant figure.")
-    
+
     # Separate value and unit for Quantity objects
     if isinstance(val, u.Quantity):
         unit = val.unit

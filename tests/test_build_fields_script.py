@@ -1,22 +1,24 @@
 import os
+
 import pandas as pd
 from click.testing import CliRunner
 
 from astroutils.cli.build_fields import main
 
-test_field_df = pd.DataFrame({'field': ['test']})
+test_field_df = pd.DataFrame({"field": ["test"]})
+
 
 def test_script_works(mocker):
+    mocker.patch(
+        "astroutils.cli.build_fields.build_field_csv", return_value=test_field_df
+    )
+    mocker.patch("astroutils.cli.build_fields.aux_path", "tests/")
 
-    mocker.patch('astroutils.cli.build_fields.build_field_csv', return_value=test_field_df)
-    mocker.patch('astroutils.cli.build_fields.aux_path', 'tests/')
-
-    os.system('mkdir -p tests/fields/')
+    os.system("mkdir -p tests/fields/")
 
     runner = CliRunner()
-    _ = runner.invoke(main, 'vastp3x -t TILES'.split())
+    _ = runner.invoke(main, "vastp3x -t TILES".split())
 
-    assert os.path.exists('tests/fields/vastp3x_tiles_fields.csv')
+    assert os.path.exists("tests/fields/vastp3x_tiles_fields.csv")
 
-    os.system('rm -r tests/fields')
-
+    os.system("rm -r tests/fields")

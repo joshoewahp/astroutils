@@ -29,11 +29,37 @@ astroutils-lightcurve = "astroutils.cli.lightcurve:main"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
+isort = "^5.13.2"
+black = "^23.12.1"
+flake8 = "^6.1.0"
+pre-commit = "^3.6.0"
 
 [tool.pytest.ini_options]
 filterwarnings = [
     "ignore::astropy.wcs.FITSFixedWarning",
 ]
+
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+line_length = 88
+profile = "black"
+include_trailing_comma = true
 
 [tool.pyright]
 reportMissingTypeStubs = false
