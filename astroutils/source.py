@@ -292,7 +292,11 @@ def fractional_pol_error(
     """
 
     if corr_errors:
-        corr_xy = sources.corr().loc[f"{flux_col}_i", f"{flux_col}_v"]
+        corr_xy = (
+            sources[[f"{flux_col}_i", f"{flux_col}_v"]]
+            .corr()
+            .loc[f"{flux_col}_i", f"{flux_col}_v"]
+        )
         logger.info(f"Using corr(I, V) = {corr_xy:.4f} for f_p error propagation.")
     else:
         corr_xy = 0
