@@ -7,7 +7,7 @@ authors = ["Joshua <jpri6587@sydney.edu.au>"]
 [tool.poetry.dependencies]
 python = "^3.11"
 astropy = "^5.0.1"
-pandas = "^1.4.1"
+pandas = "^2.1.4"
 numpy = "^1.22.2"
 matplotlib = "^3.5.1"
 colorlog = "^6.6.0"
@@ -17,10 +17,6 @@ dask = {extras = ["distributed"], version = "^2023.5.1"}
 pyarrow = "^14.0.1"
 
 [tool.poetry.dev-dependencies]
-coverage = "^6.3.2"
-mypy = "^0.941"
-pytest-mock = "^3.7.0"
-pytest-cov = "^3.0.0"
 
 [tool.poetry.scripts]
 astroutils-build-fields = "astroutils.cli.build_fields:main"
@@ -33,6 +29,10 @@ isort = "^5.13.2"
 black = "^23.12.1"
 flake8 = "^6.1.0"
 pre-commit = "^3.6.0"
+coverage = "^7.3.4"
+mypy = "^0.941"
+pytest-mock = "^3.7.0"
+pytest-cov = "4.1.0"
 
 [tool.pytest.ini_options]
 filterwarnings = [

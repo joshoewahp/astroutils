@@ -7,11 +7,13 @@ import numpy as np
 import pandas as pd
 import pytest
 from astropy.coordinates import SkyCoord
+from astropy.nddata import NoOverlapError
 
 from astroutils.io import FITSException
 from astroutils.source import (
     SelavyCatalogue,
     condon_flux_error,
+    force_measure_flux,
     fractional_pol_error,
     measure_epoch_flux,
     measure_flux,
@@ -70,7 +72,8 @@ def validate_selavy_catalogue(cat, n_expected_rows):
 
 txt_path = "tests/data/RACS_0000-12A.EPOCH00.I.selavy.components.txt"
 xml_path = "tests/data/VAST_0012+00A.EPOCH12.I.selavy.components.xml"
-stokesv_path = "tests/data/nimage.v.VAST_0021+00.SB29580.cont.taylor.0.restored.conv.components.xml"
+stokesv_path = "tests/data/nimage.v.VAST_0021+00.SB29580.components.xml"
+empty_path = "tests/data/empty_selavyfile.txt"
 
 
 @pytest.mark.parametrize(
@@ -82,44 +85,60 @@ stokesv_path = "tests/data/nimage.v.VAST_0021+00.SB29580.cont.taylor.0.restored.
         ([txt_path, xml_path], 38),
     ],
 )
-def test_selavy_path_parsing(path, num_components, survey):
+def test_selavy_path_parsing(path, num_components):
     cat = SelavyCatalogue(path)
 
     validate_selavy_catalogue(cat, num_components)
 
 
+def test_selavy_empty_components():
+    with pytest.raises(ValueError):
+        SelavyCatalogue(empty_path)
+
+
 @pytest.mark.parametrize(
-    "surveyname, field, stokes, tiletype, num_components",
+    "surveyname, fields, sbids, stokes, tiletype, num_components",
     [
-        ("racs-low", "0000-12", "i", "COMBINED", 15),
-        ("racs-low", ["0000-12", "1200-74"], "i", "COMBINED", 28),
-        ("vastp1", "0012+00", "i", "COMBINED", 23),
+        ("racs-low", "0000-12", "", "i", "COMBINED", 15),
+        ("racs-low", ["0000-12", "1200-74"], "", "i", "COMBINED", 28),
+        ("vastp12", "0012+00", "", "i", "COMBINED", 23),
+        ("vastp23", "0021+00", "SB29580", "i", "COMBINED", 7),
     ],
 )
 def test_selavy_from_params(
-    surveyname, field, stokes, tiletype, num_components, survey
+    surveyname,
+    fields,
+    sbids,
+    stokes,
+    tiletype,
+    num_components,
+    survey,
 ):
     cat = SelavyCatalogue.from_params(
-        surveyname, stokes=stokes, fields=field, tiletype=tiletype
+        surveyname,
+        stokes=stokes,
+        fields=fields,
+        sbids=sbids,
+        tiletype=tiletype,
     )
 
     validate_selavy_catalogue(cat, num_components)
 
 
-def test_selavy_from_params_raises_error_if_no_path(survey):
+def test_selavy_from_params_raises_error_if_no_path():
     with pytest.raises(FileNotFoundError):
         SelavyCatalogue.from_params(
             epoch="vastp1", fields="0012+10", stokes="i", tiletype="COMBINED"
         )
 
 
-def test_selavy_from_aegean(survey):
+def test_selavy_from_aegean():
     cat = SelavyCatalogue.from_aegean("tests/data/mwats_test.parq")
 
     validate_selavy_catalogue(cat, 10)
 
 
-def test_selavy_cone_search(survey):
+def test_selavy_cone_search():
     cat = SelavyCatalogue(xml_path)
     position = SkyCoord(ra=3.292805, dec=0.856316, unit="deg")
     components = cat.cone_search(position, radius=0.5 * u.arcmin)
@@ -129,7 +148,7 @@ def test_selavy_cone_search(survey):
     assert components.d2d.max().round(3) == 27.959
 
 
-def test_selavy_nearest_component_when_in_radius(survey):
+def test_selavy_nearest_component_when_in_radius():
     cat = SelavyCatalogue(txt_path)
 
     position_ra0 = SkyCoord(ra=0, dec=-11, unit=u.deg)
@@ -138,7 +157,7 @@ def test_selavy_nearest_component_when_in_radius(survey):
     assert len(component) == 42
 
 
-def test_selavy_nearest_component_when_not_in_radius(survey):
+def test_selavy_nearest_component_when_not_in_radius():
     cat = SelavyCatalogue(txt_path)
     position_ra0 = SkyCoord(ra=0, dec=-11, unit=u.deg)
     component = cat.nearest_component(position_ra0, radius=15 * u.arcsec)
@@ -149,13 +168,12 @@ def test_selavy_nearest_component_when_not_in_radius(survey):
 @pytest.mark.parametrize(
     "column", ["flux_peak", "flux_peak_err", "flux_int", "flux_int_err"]
 )
-def test_selavy_negative_fluxes_corrected(column, survey):
+def test_selavy_negative_fluxes_corrected(column):
     cat = SelavyCatalogue(stokesv_path)
 
     assert np.all(cat.components[column] > 0)
 
 
-# Condon Flux Error
 @pytest.fixture
 def component():
     comp = pd.Series(
@@ -180,7 +198,11 @@ def component():
 )
 def test_condon_error_calculation(bmaj, bmin, fluxtype, expected_error, component):
     error = condon_flux_error(
-        component, bmaj=bmaj, bmin=bmin, flux_scale_error=0, fluxtype=fluxtype
+        component,
+        bmaj=bmaj,
+        bmin=bmin,
+        flux_scale_error=0,
+        fluxtype=fluxtype,
     )
 
     assert error.round(3) == expected_error
@@ -189,11 +211,12 @@ def test_condon_error_calculation(bmaj, bmin, fluxtype, expected_error, componen
 def test_condon_error_bmaj_not_quantity_raises_typeerror(component):
     with pytest.raises(TypeError):
         condon_flux_error(
-            component, bmaj=15, bmin=12 * u.arcsec, flux_scale_error=0, fluxtype="peak"
+            component,
+            bmaj=15,
+            bmin=12 * u.arcsec,
+            flux_scale_error=0,
+            fluxtype="peak",
         )
-
-
-# Fractional Polarisation Error
 
 
 @pytest.fixture
@@ -225,9 +248,6 @@ def test_fractional_pol_error_calculation(corr_errors, expected_errors, fluxes):
 
     for error, expected_error in zip(fp_errors, expected_errors):
         assert round(error, 6) == expected_error
-
-
-# Measure Flux
 
 
 @pytest.fixture
@@ -280,15 +300,14 @@ def test_measure_flux_value(selavy_path, expected_flux, epochs, mocker):
     stokes = "i"
     tiletype = "TILES"
 
-    mocker.patch(
-        "astroutils.source.Path.glob", return_value=["tests/data/test_image_mJy.fits"]
-    )
-    mocker.patch("astroutils.source.find_fields", return_value=mocked_fields)
-    mocker.patch(
-        "astroutils.source.SelavyCatalogue.from_params",
-        return_value=SelavyCatalogue(selavy_path),
-    )
+    mocked_glob_results = ["tests/data/test_image_mJy.fits"]
+    sel = SelavyCatalogue(selavy_path)
 
+    mocker.patch("astroutils.source.Path.glob", return_value=mocked_glob_results)
+    mocker.patch("astroutils.source.find_fields", return_value=mocked_fields)
+    mocker.patch("astroutils.source.SelavyCatalogue.from_params", return_value=sel)
+
+    # Patch the future results from multiprocessing
     flux = measure_epoch_flux(
         position,
         epochs.iloc[0],
@@ -298,7 +317,6 @@ def test_measure_flux_value(selavy_path, expected_flux, epochs, mocker):
         tiletype,
         name="source",
     )
-
     mocker.patch("astroutils.source.Future.result", return_value=flux)
 
     fluxes = measure_flux(
@@ -311,22 +329,6 @@ def test_measure_flux_value(selavy_path, expected_flux, epochs, mocker):
     )
 
     assert fluxes.flux.iloc[0].round(3) == expected_flux
-
-
-def test_measure_flux_coordinates_with_no_fields(mocker, epochs):
-    mocker.patch("astroutils.source.find_fields", return_value=pd.DataFrame())
-
-    position = SkyCoord(ra=189.0104, dec=-1.9861, unit="deg")
-
-    with pytest.raises(FITSException):
-        measure_flux(
-            position,
-            epochs,
-            size=0.1 * u.deg,
-            fluxtype="int",
-            stokes="i",
-            tiletype="TILES",
-        )
 
 
 @pytest.mark.parametrize(
@@ -342,3 +344,58 @@ def test_measure_limit_values(image_path, expected_flux):
     limit = measure_limit(position=position, image_path=image_path, size=0.1 * u.deg)
 
     assert limit.round(4) == expected_flux
+
+
+@pytest.mark.parametrize(
+    "position, image, background, noise, expected_flux, is_limit, overlap",
+    [
+        (
+            SkyCoord(ra=189.0104, dec=-1.9861, unit="deg"),
+            Path("tests/data/test_image_Jy.fits"),
+            Path("tests/data/noimage.fits"),
+            Path("tests/data/noimage.fits"),
+            1.1002,
+            True,
+            True,
+        ),
+        (
+            SkyCoord(ra=189.0104, dec=-10.9861, unit="deg"),
+            Path("tests/data/test_image_Jy.fits"),
+            Path("tests/data/noimage.fits"),
+            Path("tests/data/noimage.fits"),
+            1.1002,
+            True,
+            False,
+        ),
+    ],
+)
+def test_force_measure_flux(
+    position,
+    image,
+    background,
+    noise,
+    expected_flux,
+    is_limit,
+    overlap,
+):
+    if not overlap:
+        with pytest.raises(NoOverlapError):
+            component, limit_flag = force_measure_flux(
+                position=position,
+                image=image,
+                background=background,
+                noise=noise,
+                size=0.1 * u.deg,
+            )
+        return
+
+    component, limit_flag = force_measure_flux(
+        position=position,
+        image=image,
+        background=background,
+        noise=noise,
+        size=0.1 * u.deg,
+    )
+
+    assert is_limit == limit_flag
+    assert component.flux_peak.round(4) == expected_flux

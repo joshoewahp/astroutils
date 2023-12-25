@@ -344,16 +344,10 @@ def force_measure_flux(
         logger.debug("Missing background/noise maps, measuring RMS from image.")
 
         # If rms/background files missing, just use average survey RMS
-        try:
-            flux = measure_limit(position, image, size)
-            rms = flux / 3
-            flux_err = np.nan
-            is_limit = True
-        except NoOverlapError:
-            logger.debug(
-                f"Image does not contain position <{position.ra:.2f},{position.dec:.2f}>"
-            )
-            return None, None
+        flux = measure_limit(position, image, size)
+        rms = flux / 3
+        flux_err = np.nan
+        is_limit = True
 
     component = pd.Series(
         {
@@ -425,17 +419,19 @@ def measure_epoch_flux(
             rms_file = Path(noise_filepattern.replace("image.", "noiseMap.image."))
 
             # Then force a measurement in the image and measure 3-sigma limit from RMS map
-            component, is_limit = force_measure_flux(
-                position,
-                image_file,
-                bkg_file,
-                rms_file,
-                size,
-            )
-            is_forced = True
-
-            # Neither selavy or forced fit possible. Move to next field.
-            if component is None:
+            try:
+                component, is_limit = force_measure_flux(
+                    position,
+                    image_file,
+                    bkg_file,
+                    rms_file,
+                    size,
+                )
+                is_forced = True
+            except NoOverlapError:
+                logger.debug(
+                    f"Image does not contain position <{position.ra:.2f},{position.dec:.2f}>"
+                )
                 continue
 
         if not is_forced:
@@ -451,24 +447,19 @@ def measure_epoch_flux(
             flux_err = component[f"flux_{fluxtype}_err"]
             rms = component.rms_image
 
-        try:
-            data = {
-                "source": name,
-                "epoch": epoch["name"],
-                "obsdate": header.get("DATE-OBS", ""),
-                "field": field.field,
-                "flux": flux,
-                "flux_err": flux_err,
-                "rms_image": rms,
-                "snr": abs(flux / rms),
-                "is_limit": is_limit,
-                "is_forced": is_forced,
-                "dist_field_centre": field.dist_field_centre,
-            }
-        except KeyError:
-            print(name, stokes, epoch["name"])
-            print(header.keys)
-            raise
+        data = {
+            "source": name,
+            "epoch": epoch["name"],
+            "obsdate": header.get("DATE-OBS", ""),
+            "field": field.field,
+            "flux": flux,
+            "flux_err": flux_err,
+            "rms_image": rms,
+            "snr": abs(flux / rms),
+            "is_limit": is_limit,
+            "is_forced": is_forced,
+            "dist_field_centre": field.dist_field_centre,
+        }
 
         components.append(data)
 
