@@ -47,4 +47,4 @@ def setupLogger(verbose: bool, filename: Optional[str] = None) -> None:
 
     root_logger.addHandler(stream_handler)
 
-    return None
+    return

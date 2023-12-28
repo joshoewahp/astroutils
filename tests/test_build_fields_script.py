@@ -10,7 +10,8 @@ test_field_df = pd.DataFrame({"field": ["test"]})
 
 def test_script_works(mocker):
     mocker.patch(
-        "astroutils.cli.build_fields.build_field_csv", return_value=test_field_df
+        "astroutils.cli.build_fields.build_field_csv",
+        return_value=test_field_df,
     )
     mocker.patch("astroutils.cli.build_fields.aux_path", "tests/")
 

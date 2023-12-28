@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 from astropy.coordinates import Angle, SkyCoord
 from astropy.io import fits
+from astropy.io.fits import PrimaryHDU
 from astropy.wcs import WCS, FITSFixedWarning
 
 warnings.filterwarnings("ignore", category=FITSFixedWarning, append=True)
@@ -116,14 +117,10 @@ def get_survey(epoch: str, is_name: bool = False) -> pd.Series:
     return survey
 
 
-<<<<<<< HEAD
-def get_image_data_header(image_path: Path, load_data: bool = True):
-=======
 def get_image_data_header(
     image_path: Path,
     load_data: bool = True,
 ) -> tuple[np.array, PrimaryHDU]:
->>>>>>> 8434e1a (updated dependencies)
     """Open FITS image and fetch header / data in units of mJy/beam."""
 
     with fits.open(image_path) as hdul:
@@ -139,17 +136,12 @@ def get_image_data_header(
 
 
 def get_image_from_survey_params(
-<<<<<<< HEAD
-    epoch: pd.Series, field: str, stokes: str, tiletype: str, load: bool = True
-):
-=======
     epoch: pd.Series,
     field: str,
     stokes: str,
     tiletype: str,
     load: bool = True,
 ) -> tuple[np.array, PrimaryHDU]:
->>>>>>> 8434e1a (updated dependencies)
     """Get image header and data for a given field, epoch, and Stokes parameter."""
 
     image_path = list(
@@ -161,7 +153,10 @@ def get_image_from_survey_params(
 
 
 def find_fields(
-    position: SkyCoord, epoch: str, tiletype: Strset, radius: Angle = 5 * u.deg
+    position: SkyCoord,
+    epoch: str,
+    tiletype: Strset,
+    radius: Angle = 5 * u.deg,
 ) -> pd.DataFrame:
     """Return DataFrame of epoch fields containing position."""
 
@@ -272,6 +267,7 @@ def build_field_csv(epoch: str, tiletype: str = "TILES") -> pd.DataFrame:
 
 
 def build_vlass_field_csv(epoch: str) -> pd.DataFrame:
+    """Generate metadata csv for VLASS images."""
     survey = get_survey(epoch)
     base_dir = Path(survey.data_path)
 

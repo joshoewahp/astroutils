@@ -1,6 +1,4 @@
 from pathlib import Path
-from unittest import TestCase
-from unittest.mock import patch
 
 import astropy.units as u
 import numpy as np
@@ -9,7 +7,6 @@ import pytest
 from astropy.coordinates import SkyCoord
 from astropy.nddata import NoOverlapError
 
-from astroutils.io import FITSException
 from astroutils.source import (
     SelavyCatalogue,
     condon_flux_error,

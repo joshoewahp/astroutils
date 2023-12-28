@@ -14,13 +14,21 @@ from astropy.table import Table
 from astropy.wcs import WCS
 from forced_phot import ForcedPhot
 
-from astroutils.io import (find_fields, get_image_data_header,
-                           get_image_from_survey_params, get_survey)
+from astroutils.io import (
+    find_fields,
+    get_config,
+    get_image_data_header,
+    get_image_from_survey_params,
+    get_survey,
+)
 
 logger = logging.getLogger(__name__)
 
 Pathset = Union[str, Path, list[str], list[Path]]
 Strset = Union[str, list[str]]
+
+config = get_config()
+aux_path = Path(config["DATA"]["aux_path"])
 
 
 class SelavyCatalogue:
@@ -103,7 +111,7 @@ class SelavyCatalogue:
             fields = [fields]
 
         if sbids == "":
-            sbids = ["" for field in fields]
+            sbids = ["" for _ in fields]
         elif isinstance(sbids, str):
             sbids = [sbids]
 
@@ -313,7 +321,7 @@ def force_measure_flux(
     # Perform forced extraction
     try:
         FP = ForcedPhot(str(image), str(background), str(noise), verbose=True)
-        flux, flux_err, chisq, DOF, cluster_id = FP.measure(
+        flux, flux_err, _, _, _ = FP.measure(
             position,
             cluster_threshold=0,
         )
@@ -576,9 +584,8 @@ def get_stokes_matches(
     in order to easily identify isolated sources that sample polarisation leakage across the field.
     """
 
-    fields = pd.read_csv(
-        f"/import/ada1/jpri6587/aux_data/fields/{survey}_{tiletype.lower()}_fields.csv"
-    )
+    fields_path = aux_path / f"fields/{survey}_{tiletype.lower()}_fields.csv"
+    fields = pd.read_csv(fields_path)
 
     components = []
     for _, field in fields.iterrows():
