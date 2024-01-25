@@ -1,3 +1,4 @@
+import os
 import re
 import logging
 import astropy.units as u
@@ -13,7 +14,15 @@ from typing import Union, cast
 from forced_phot import ForcedPhot
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 
-from astroutils.io import find_fields, get_image_data_header, get_survey, get_image_from_survey_params
+from astroutils.io import find_fields, get_image_data_header, get_survey, get_surveys, get_image_from_survey_params, get_config
+
+
+config = get_config()
+aux_path = Path(config['DATA']['aux_path'])
+
+SURVEYS = get_surveys()
+SURVEYS = SURVEYS[SURVEYS.radio & SURVEYS.local]
+SURVEYS = SURVEYS[~SURVEYS.survey.isin(['vlass1', 'vlass2', 'mwats'])]
 
 logger = logging.getLogger(__name__)
 
@@ -106,11 +115,11 @@ class SelavyCatalogue:
         for field, sbid in zip(fields, sbids):
 
             # First try locating catalogues in xml format
-            files = list(selavypath.glob(f'*[._]{field}[AB.]*{sbid}.*components.xml'))
+            files = list(selavypath.glob(f'*[._]*{field}[AB.]*{sbid}.*components.xml'))
 
             # then try txt format
             if len(files) == 0:
-                files = list(selavypath.glob(f'*[._]{field}[AB.]*{sbid}.*components.txt'))
+                files = list(selavypath.glob(f'*[._]*{field}[AB.]*{sbid}.*components.txt'))
 
             # then try early RACS pattern with SBID first
             if len(files) == 0:
@@ -192,6 +201,63 @@ class SelavyCatalogue:
             return None
         
         return components.sort_values('d2d').iloc[0]
+
+
+def load_all_catalogues(stokes):
+    
+    components = []
+    for _, survey in SURVEYS.iterrows():
+
+        logger.info(f"Reading {survey.survey} Stokes {stokes} components")
+
+        try:
+            sel = SelavyCatalogue.from_params(
+                epoch=survey.survey,
+                stokes=stokes,
+                tiletype='TILES',
+                fields='',
+                sbids='',
+            )
+        except FileNotFoundError:
+            continue
+
+        sel.components['survey'] = survey.survey
+
+        components.append(sel.components)
+
+    components = pd.concat(components).sort_values('ra_deg_cont').reset_index(drop=True)
+
+    return components
+
+def get_all_catalogues(stokes):
+
+    # Check for cached parquet file
+    path = aux_path / f'all_stokes{stokes}_selavy.parq'
+
+    if os.path.exists(path):
+        selavy = pd.read_parquet(path)
+    else:
+        selavy = pd.DataFrame({
+            'survey': [],
+        })
+
+
+    # Check catalogues are up to date
+    new_surveys = list(set(SURVEYS.survey) - set(selavy.survey.drop_duplicates().values))
+
+    if len(new_surveys) == 0:
+        return selavy
+
+    new_selavy = load_all_catalogues(stokes=stokes)
+
+    if selavy.empty:
+        selavy = newselavy
+    else:
+        selavy = pd.concat([selavy, newselavy])
+
+    selavy.to_parquet(path)
+
+    return selavy
 
 
 def condon_flux_error(
@@ -404,24 +470,19 @@ def measure_epoch_flux(
             flux_err = component[f'flux_{fluxtype}_err']
             rms = component.rms_image
 
-        try:
-            data = {
-                'source': name,
-                'epoch': epoch['name'],
-                'obsdate': header.get('DATE-OBS', ''),
-                'field': field.field,
-                'flux': flux,
-                'flux_err': flux_err,
-                'rms_image': rms,
-                'snr': abs(flux/rms),
-                'is_limit': is_limit,
-                'is_forced': is_forced,
-                'dist_field_centre': field.dist_field_centre,
-            }
-        except KeyError:
-            print(name, stokes, epoch['name'])
-            print(header.keys)
-            raise
+        data = {
+            'source': name,
+            'epoch': epoch['name'],
+            'obsdate': header.get('DATE-OBS', ''),
+            'field': field.field,
+            'flux': flux,
+            'flux_err': flux_err,
+            'rms_image': rms,
+            'snr': abs(flux/rms),
+            'is_limit': is_limit,
+            'is_forced': is_forced,
+            'dist_field_centre': field.dist_field_centre,
+        }
 
         components.append(data)
 
@@ -571,7 +632,7 @@ def get_stokes_matches(
         cV = SkyCoord(ra=sel_v.ra_deg_cont, dec=sel_v.dec_deg_cont, unit='deg')
         cI = SkyCoord(ra=sel_i.ra_deg_cont, dec=sel_i.dec_deg_cont, unit='deg')
 
-        idxI, idxV, d2d, _ = cV.search_around_sky(cI, 20*u.arcsec)
+        idxI, idxV, d2d, _ = cV.search_around_sky(cI, 4*u.arcsec)
 
         df = pd.DataFrame({
             'idx_I': idxI,
@@ -617,7 +678,7 @@ def get_stokes_matches(
             right_on='field',
         )
         df['cp'] = df.V_flux_peak / df.I_flux_peak
-        df['nmatches'] = df.groupby('idx_V').transform('size')
+        df['nmatches'] = df.groupby('idx_V').idx_I.transform('size')
 
         field_coord = SkyCoord(ra=df.cr_ra_pix, dec=df.cr_dec_pix, unit='deg')
         c = SkyCoord(ra=df.I_ra_deg_cont, dec=df.I_dec_deg_cont, unit='deg')

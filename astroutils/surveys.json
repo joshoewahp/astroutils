@@ -2112,7 +2112,7 @@
     "dec_max": 40,
     "gal_lim": 0,
     "has_stokesv": true,
-    "local": true,
+    "local": false,
     "radio": true,
     "cutout": true,
     "cutout_size": 0.15
