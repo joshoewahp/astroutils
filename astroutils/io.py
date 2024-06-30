@@ -40,6 +40,10 @@ def get_config() -> configparser.ConfigParser:
     config = configparser.ConfigParser()
     config.read(config_path.resolve())
 
+    # Replace AUX_PATH environment variable if exists
+    if aux_path := os.environ.get("AUX_PATH"):
+        config["DATA"]["aux_path"] = aux_path
+
     return config
 
 
