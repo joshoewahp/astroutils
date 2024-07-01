@@ -155,6 +155,26 @@ def get_image_from_survey_params(
 
     return data, header
 
+def find_fields_all(
+        position: SkyCoord, 
+        tiletype: Strset, 
+        radius: Angle= 5 * u.deg,
+    ) -> pd.DataFrame:
+    surveys = pd.read_json(SURVEYS_PATH)
+    surveys = surveys[(surveys.radio) & (surveys.local)]
+    
+    fields = []
+    for _, survey in surveys.iterrows():
+        try:
+            f = find_fields(position, survey.survey, tiletype=tiletype, radius=radius)
+        except (FileNotFoundError, FITSException):
+            logger.warning(f"No data for epoch {survey.survey}")
+            continue
+        f['survey'] = survey.survey
+
+        fields.append(f)
+
+    return pd.concat(fields).reset_index(drop=True)
 
 def find_fields(
     position: SkyCoord,
@@ -170,12 +190,13 @@ def find_fields(
         image_df = pd.read_csv(path)
     except FileNotFoundError:
         raise FITSException(f"Missing field metadata csv for {epoch} at {path}.")
-
-    beam_centre = SkyCoord(
-        ra=image_df["cr_ra_pix"], dec=image_df["cr_dec_pix"], unit=u.deg
-    )
-    image_df["dist_field_centre"] = beam_centre.separation(position).deg
-
+    except pd.errors.EmptyDataError:
+        logger.info(f"Data missing in file:\n{path}")
+        raise
+    
+    beam_centre = SkyCoord(ra=image_df['cr_ra_pix'], dec=image_df['cr_dec_pix'], unit=u.deg)
+    image_df['dist_field_centre'] = beam_centre.separation(position).deg
+    
     fields = image_df[image_df.dist_field_centre < radius].reset_index(drop=True)
 
     return fields
