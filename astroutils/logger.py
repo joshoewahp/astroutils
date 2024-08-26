@@ -19,6 +19,7 @@ def setupLogger(verbose: bool, filename: Optional[str] = None) -> None:
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("lightkurve").setLevel(logging.CRITICAL)
     logging.getLogger("altaipony").setLevel(logging.WARNING)
+    logging.getLogger("h5py").setLevel(logging.INFO)
 
     if filename:
         formatter = logging.Formatter(
